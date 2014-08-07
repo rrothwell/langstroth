@@ -54,7 +54,7 @@ function restructureAllocations(allocationTree, isCoreQuota) {
 			sum = nextLevelSum(child.children, isCoreQuota);
     	} else {
     		// add the leaf value.
-			allocationItem.id = child.id;
+			//RR allocationItem.id = child.id;
 			allocationItem.projectName = child.name;
 			allocationItem.institutionName = child.institution;
 			allocationItem.coreQuota = child.coreQuota;
@@ -208,8 +208,8 @@ var totalText = statisticsArea.append("text")
 			});
 			visualise(dataset, totalResource);	
 	 	} else {
-	 		window.location.href = '/nacc/allocations/' + p.data.id + '/project';
-	 		//window.location.href = '/nacc/allocations/' + p.data.id + '/project/allocations';
+	 		// Instead of zooming plot navigate to another page.
+	 		//RR window.location.href = '/nacc/allocations/' + p.data.id + '/project';
 	 	}
 	  }
 
