@@ -11,7 +11,6 @@
 
 .project-details-container { 
 	vertical-align: middle;
-	background-color: #aaaaaa; 
 	border-radius:3px;
 	margin: 20 auto;
 	padding: 10px;
@@ -92,7 +91,6 @@ table.for-table th {
 }
 
 .project-visualisation-container h4 { 
-	font-size: 12px;
 	font-weight: bold;
 	text-align: center;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;

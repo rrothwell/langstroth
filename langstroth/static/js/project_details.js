@@ -33,8 +33,8 @@ function tabulateSummary(pageAreaSelector, project_summary) {
 
 	// Define the table with heading.
 	var table = d3.select(pageAreaSelector).append("table")
-					.attr("class", "details-table");	
-	table.append("caption").text("Current Allocation"); 
+					.attr("class", "table-striped table-bordered table-condensed");	
+	//table.append("caption").text("Current Allocation"); 
 	tbody = table.append("tbody"); 
 
 	// Add rows with rows (tr), row headings (th) and the detail entries (td).
@@ -106,6 +106,9 @@ function graphQuota(pageAreaSelector, quotaKey, usage) {
 				.attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
 				.attr("dy", ".35em")
 				.style("text-anchor", "middle")
+				.style("font-weight", "bold")
+				.style("font-family", "'Helvetica Neue', Helvetica, Arial, sans-serif")
+				.style("font-size", "13px")
 				.text(function(d) { 
 					var usageQuota = (usage[0] + usage[1]) + "";
 					return d.data == "0" ? "" : d.data + "/" + usageQuota; 
@@ -155,6 +158,9 @@ function graphFieldOfResearch(pageAreaSelector, forUsage, forTranslation) {
 				.attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
 				.attr("dy", ".35em")
 				.style("text-anchor", "middle")
+				.style("font-weight", "bold")
+				.style("font-family", "'Helvetica Neue', Helvetica, Arial, sans-serif")
+				.style("font-size", "13px")
 				.on("mouseover", showRelatedLabels)
 				.on("mousemove", moveRelatedLabels)
 				.on("mouseout", hideRelatedLabels)
