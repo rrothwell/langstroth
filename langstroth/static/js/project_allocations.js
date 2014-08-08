@@ -24,10 +24,10 @@ function projectDetails(elementId) {
 			
 			var table = d3.select(elementId)
 							.append("table")
-							.attr("class", "details-table");
+							.attr("class", "table-striped table-bordered table-condensed");
 			
-			var caption = table.append("caption")
-							.text("Allocation: " + allocationIndex); 
+//			var caption = table.append("caption")
+//							.text("Allocation: " + allocationIndex); 
 			var thead = table.append("thead"); // Not used.			
 			var tbody = table.append("tbody")
 			
