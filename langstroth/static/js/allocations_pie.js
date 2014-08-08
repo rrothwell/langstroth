@@ -294,32 +294,30 @@ var totalText = statisticsArea.append("text")
 	function showRelatedLabels(d, i) { 
 		showRelatedNameLabel(d, i);
 		showRelatedValueLabel(d, i);
-		if (!isForCodeLevel()) {
-			showDetails(d);
-			toolTip.style("visibility", "visible");
+		if (isForCodeLevel()) {
+			showFORDescription(d);
+		} else {
+			showProjectSummary(d);
 		}
+		toolTip.style("visibility", "visible");
 	}
 
 	function moveRelatedLabels(d, i) { 
 		var top = (d3.event.pageY - 10) + "px";
 		var left = (d3.event.pageX + 10) + "px";
-		if (!isForCodeLevel()) {
-			toolTip.style("top", top).style("left", left);
-		}
+		toolTip.style("top", top).style("left", left);
 	}
 
 	function hideRelatedLabels(d, i) { 
 		hideRelatedNameLabel(d, i);
 		hideRelatedValueLabel(d, i);
-		if (!isForCodeLevel()) {
-			toolTip.style("visibility", "hidden");
-		}
+		toolTip.style("visibility", "hidden");
 	}
 
-	//---- Popup showing details.
+	//---- Popup showing project summary.
 		  	
-	function showDetails(d) {
-	 		var markup = "<div class='details-container centred-container'>" 
+	function showProjectSummary(d) {
+	 	var markup = "<div class='details-container centred-container'>" 
  			+ "<table class='details-table'>" 
  			+ "<tr>"
  			+ "<th>"
@@ -362,7 +360,27 @@ var totalText = statisticsArea.append("text")
  			+ "</tr>"
  			+ "</table>"
  			+ "</div>";
-		var plotDetails = toolTip.html(markup);
+		toolTip.html(markup);
+	}
+
+	//---- Popup showing full field-of-reserarch name.
+		  	
+	function showFORDescription(d) {
+		var forCode = d.data.target;
+  		var forName = forTitleMap[forCode].toLowerCase();
+	 	var markup = "<div class='details-container centred-container'>" 
+ 			+ "<table class='for-table'>" 
+ 			+ "<tr>"
+ 			+ "<th>"
+ 			+ "FOR: " 
+ 			+ "</th>"
+ 			+ "<td style='text-transform: capitalize;'>"
+ 			+  forName     		
+ 			+ "</td>"
+ 			+ "</tr>"
+ 			+ "</table>"
+ 			+ "</div>";
+	 	toolTip.html(markup);
 	}
 
 	//----- Visualise Data
@@ -396,12 +414,12 @@ function visualise( dataset, totalResource ) {
       .attr("id", function(d, i) { return 'name-plot-label-' + i; })
       .attr("class", 'name-plot-label')
       .text(function(d) {
-      	var label = d.data.target;
+      	var label = null;
       	if (isForCodeLevel()) {
       		var forCode = d.data.target;
       		label = forTitleMap[forCode].toLowerCase().abbreviate(LABEL_MAX_LENGTH) + " (" + forCode + ")";
       	} else {
-      		label = label.abbreviate(LABEL_MAX_LENGTH + 5);
+      		label = d.data.target.abbreviate(LABEL_MAX_LENGTH + 5);
       	}
         return label;
       })
@@ -482,12 +500,12 @@ function visualise( dataset, totalResource ) {
       .attr("id", function(d, i) { return 'name-plot-label-' + i; })
       .attr("class", 'name-plot-label')
       .text(function(d) {
-      	var label = d.data.target;
+      	var label = null;
       	if (isForCodeLevel()) {
       		var forCode = d.data.target;
       		label = forTitleMap[forCode].toLowerCase().abbreviate(LABEL_MAX_LENGTH) + " (" + forCode + ")";
       	} else {
-      		label = label.abbreviate(LABEL_MAX_LENGTH + 5);
+      		label = d.data.target.abbreviate(LABEL_MAX_LENGTH + 5);
       	}      		
         return label;
       })

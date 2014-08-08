@@ -51,8 +51,33 @@ table.details-table th {
 table.details-table caption{ 
 	background-color: #aaaaaa; 
 	font-weight: bold;
-	color: yellow;
+	color: white;
 }
+
+
+table.for-table { 
+	width: 100%;
+	vertical-align: middle;
+	font: 12px sans-serif;
+	text-align: center;
+	background-color: white; 
+	border-radius:3px;
+	margin: 0 auto;
+}
+
+table.for-table td {
+	padding: 3px 5px 3px 5px;
+	vertical-align: top;
+	text-align: left;
+}
+
+table.for-table th {
+	padding: 3px 5px 3px 5px;
+	width: 3em;
+	vertical-align: top;
+	text-align: right;
+}
+
 
 
 /* Master List */
