@@ -130,6 +130,8 @@ var color = d3.scale.category20();
 
 var TEXT_HEIGHT_ALLOWANCE = .1;
 
+var LABEL_MAX_LENGTH = 10;
+
 //---- Popup on mouseover for sectors and table rows.
 
 var toolTip = d3.select("body")
@@ -434,7 +436,9 @@ function visualise( dataset, totalResource ) {
       	var label = d.data.target;
       	if (isForCodeLevel()) {
       		var forCode = d.data.target;
-      		label = forTitleMap[forCode].toLowerCase() + " (" + forCode + ")";
+      		label = forTitleMap[forCode].toLowerCase().abbreviate(LABEL_MAX_LENGTH) + " (" + forCode + ")";
+      	} else {
+      		label = label.abbreviate(LABEL_MAX_LENGTH + 5);
       	}
         return label;
       })
@@ -518,8 +522,10 @@ function visualise( dataset, totalResource ) {
       	var label = d.data.target;
       	if (isForCodeLevel()) {
       		var forCode = d.data.target;
-      		label = forTitleMap[forCode].toLowerCase() + " (" + forCode + ")";
-      	}
+      		label = forTitleMap[forCode].toLowerCase().abbreviate(LABEL_MAX_LENGTH) + " (" + forCode + ")";
+      	} else {
+      		label = label.abbreviate(LABEL_MAX_LENGTH + 5);
+      	}      		
         return label;
       })
     	.style("opacity", 0)
