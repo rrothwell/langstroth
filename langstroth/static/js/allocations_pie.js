@@ -143,6 +143,8 @@ var TEXT_HEIGHT_ALLOWANCE = .1;
 
 var LABEL_MAX_LENGTH = 10;
 
+var ROTATION_OFFSET = 0;
+
 //---- Popup on mouseover for sectors and table rows.
 
 var toolTip = d3.select("body")
@@ -162,16 +164,18 @@ var plotGroup = d3.select("#plot-area").append("svg")
       .attr("width", WIDTH)
       .attr("height", HEIGHT)
       .append("g")
-      .attr("transform", "translate(" + WIDTH / 2 + "," + HEIGHT / 2 + ")");
+      .attr("transform", "translate(" + WIDTH / 2 + "," + HEIGHT / 2 + ") rotate(" + -ROTATION_OFFSET + ")");
 
 //---- Define the plot layout and plotting algorithm - a pie chart.
 
 var pie = d3.layout.pie()
-      .value(function(d) { return d.value; });
+	.startAngle(-Math.PI / 2)
+	.endAngle(2 * Math.PI - Math.PI / 2)
+	.value(function(d) { return d.value; });
 
 var arc = d3.svg.arc()
-      .innerRadius(INNER_RADIUS)
-      .outerRadius(OUTER_RADIUS);
+	.innerRadius(INNER_RADIUS)
+	.outerRadius(OUTER_RADIUS);
 
 // Pie slices showing sub-totals.
 // Set the start and end angles to 0 so we can transition
@@ -198,6 +202,7 @@ zoomOutButton.append("text")
 	.attr("class", "click-message")
 	.attr("text-anchor", "middle")
 	.attr("dy", "0.3em")
+	.attr("transform", "rotate(" + ROTATION_OFFSET + ")")
 	.text(ZOOM_OUT_MESSAGE);
 
 // Text for showing totals.
