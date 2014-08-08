@@ -330,7 +330,7 @@ var totalText = statisticsArea.append("text")
 		  	
 	function showProjectSummary(d) {
 	 	var markup = "<div class='details-container centred-container'>" 
- 			+ "<table class='details-table'>" 
+ 			+ "<table class='table-striped table-bordered table-condensed'>" 
  			+ "<tr>"
  			+ "<th>"
  			+ "Project: " 
@@ -381,7 +381,7 @@ var totalText = statisticsArea.append("text")
 		var forCode = d.data.target;
   		var forName = forTitleMap[forCode].toLowerCase();
 	 	var markup = "<div class='details-container centred-container'>" 
- 			+ "<table class='for-table'>" 
+ 			+ "<table class='table-striped table-bordered table-condensed'>" 
  			+ "<tr>"
  			+ "<th>"
  			+ "FOR: " 

@@ -3,6 +3,7 @@
 //==== Details Table
 
 var headings = {
+	"modified_time" : "Modified time",
 	"project_name" : "Project name",
 	"start_date" : "Start date",
 	"end_date" : "End date",
@@ -10,8 +11,7 @@ var headings = {
 	"usage_patterns" : "Usage patterns",
 	"instance_quota" : "Instance quota",
 	"core_quota" : "Core quota",
-	"submit_date" : "Submit date",
-	"modified_time" : "Modified time"
+	"submit_date" : "Submit date"
 };
 
 
@@ -24,7 +24,8 @@ function projectDetails(elementId) {
 			
 			var table = d3.select(elementId)
 							.append("table")
-							.attr("class", "table-striped table-bordered table-condensed");
+							.attr("class", "table-striped table-bordered table-condensed")
+							.style("margin-bottom", "20px");
 			
 //			var caption = table.append("caption")
 //							.text("Allocation: " + allocationIndex); 
@@ -42,6 +43,7 @@ function projectDetails(elementId) {
 				.append("tr");
 			
 			rows.append("th")
+			.style("min-width", "100px")
 				.text(function(row) { 
 						return headings[row]; 
 					});

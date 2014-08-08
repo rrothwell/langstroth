@@ -4,14 +4,14 @@
 
 var headings = {
 	"project_name" : "Project name",
+	"modified_time" : "Modified time",
 	"start_date" : "Start date",
 	"end_date" : "End date",
 	"use_case" : " Use case",
 	"usage_patterns" : "Usage patterns",
 	"instance_quota" : "Instance quota",
 	"core_quota" : "Core quota",
-	"submit_date" : "Submit date",
-	"modified_time" : "Last modified time"
+	"submit_date" : "Submit date"
 };
 
 var toolTip = d3.select("body")
@@ -19,8 +19,7 @@ var toolTip = d3.select("body")
 				.style("position", "absolute")
 				.style("z-index", "10")
 				.style("visibility", "hidden")
-				.style("background-color", "#bbbbbb")
-				.style("color", "yellow")
+				.style("background-color", "rgba(255,255,255,0.75)")
 				.style("padding", "2px 4px 2px 4px")
 				.style("border-radius", "3px")
 				.text("a simple tooltip");
@@ -49,6 +48,7 @@ function tabulateSummary(pageAreaSelector, project_summary) {
 					.append("tr");
 	
 	rows.append("th")
+		.style("min-width", "100px")
 		.text(function(row) { 
 				return headings[row]; 
 			});
