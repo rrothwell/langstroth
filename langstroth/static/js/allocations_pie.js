@@ -85,9 +85,8 @@ function nextLevelSum(children, isCoreQuota) {
 	return sum;
 }
 
-//==== Data visualisation
 
-//---- Visualisation Constants
+//==== String utilities
 
 String.prototype.abbreviate = function(charCount) {
 	var labelStr = this;
@@ -96,6 +95,17 @@ String.prototype.abbreviate = function(charCount) {
 	}
 	return labelStr;
 };
+
+String.prototype.makeWrappable = function() {
+	var labelStr = this;
+    var regex = new RegExp("_", "g");
+    labelStr = labelStr.replace(regex, " ");
+	return labelStr;
+};
+
+//==== Data visualisation
+
+//---- Visualisation Constants
 
 // Chart dimensions
 var WIDTH = 960,
@@ -324,7 +334,7 @@ var totalText = statisticsArea.append("text")
  			+ "Project: " 
  			+ "</th>"
  			+ "<td>"
- 			+ d.data.projectName
+ 			+ d.data.projectName.makeWrappable()
  			+ "</td>"
  			+ "</tr>"
  			+ "<th>"
