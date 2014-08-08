@@ -27,14 +27,14 @@ var toolTip = d3.select("body")
 
 
 //==== HTML Table For Project Details.
-// Popluated on page load. Dynamic update afger page load is not supported.
+// Populated on page load. Dynamic update after page load is not supported.
 
 function tabulateSummary(pageAreaSelector, project_summary) {
 
 	// Define the table with heading.
 	var table = d3.select(pageAreaSelector).append("table")
 					.attr("class", "details-table");	
-	table.append("caption").text("Aggregate Allocation"); 
+	table.append("caption").text("Current Allocation"); 
 	tbody = table.append("tbody"); 
 
 	// Add rows with rows (tr), row headings (th) and the detail entries (td).
@@ -63,16 +63,16 @@ function tabulateSummary(pageAreaSelector, project_summary) {
 
 // Pie chart constants.
 
-var PIE_CHART_WIDTH = 100;
-var PIE_CHART_HEIGHT = 100;
+var PIE_CHART_WIDTH = 92;
+var PIE_CHART_HEIGHT = 92;
 var PIE_CHART_RADIUS = Math.min(PIE_CHART_WIDTH, PIE_CHART_HEIGHT) / 2;
-var PIE_CHART_INNER_RADIUS = PIE_CHART_RADIUS*0.5;
+var PIE_CHART_INNER_RADIUS = PIE_CHART_RADIUS*0.0;
 
 function graphQuota(pageAreaSelector, quotaKey, usage) {
 		
 	var color = d3.scale.ordinal()
 				// Color for used quota then unused quota.
-			    .range(["#5687d1", "#dddddd"]);
+			    .range(["#006ccf", "#f2f2f2"]);
 
 	var pie = d3.layout.pie()
 				.value(function(d) { 
