@@ -315,43 +315,6 @@ var totalText = statisticsArea.append("text")
 			toolTip.style("visibility", "hidden");
 		}
 	}
-	
-	//----- Build and display project table
-
-	var masterListArea = d3.select("#master-list-area");
-	var masterListTable = masterListArea
-		.append("div")
-		.attr("class", "master-list-container")
-			.append("table")
-				.attr("class", "master-list-table");
-	masterListTable.append("caption")
-		.attr("class", "master-list-text")
-		.text("Project list: ");
-	var masterListBody = masterListTable.append("tbody")
-			.attr("class", "master-list-text");
-			
-	var masterListHeader = masterListBody.append("tr");		
-	masterListHeader.append("th").text("Name");		
-	masterListHeader.append("th").text("Cores");		
-	masterListHeader.append("th").text("Info");		
-
-	function handleProjectMouseOver(d) {
-		$(this).find('span.glyphicon').removeClass('glyphicon-inactive').addClass('glyphicon-active');
-		showDetails(d);
-		return toolTip.style("visibility", "visible");
-	}	
-	
-	function handleProjectMouseMove () {
-		var cellLocation = this.getBoundingClientRect();
-		var top = (d3.event.pageY-10)+"px";
-		var left = (cellLocation.right + 8)+"px";
-		return toolTip.style("top", top).style("left", left);
-	}
-	   
-	function handleProjectMouseOut() {
-		$(this).find('span.glyphicon').removeClass('glyphicon-active').addClass('glyphicon-inactive');
-		return toolTip.style("visibility", "hidden");
-	}
 
 	//---- Popup showing details.
 		  	
@@ -444,7 +407,7 @@ function visualise( dataset, totalResource ) {
       })
       .style("opacity", 0)
       .attr("transform", function(d) {
-        return "translate(" + offset_label(d, this.getComputedTextLength()) + ") rotate(" + angle(d) + ")";
+        return "translate(" + offsetLabel(d, this.getComputedTextLength()) + ") rotate(" + angle(d) + ")";
       })
       .style("text-transform", "capitalize")
        .on("click", zoomIn)
@@ -530,7 +493,7 @@ function visualise( dataset, totalResource ) {
       })
     	.style("opacity", 0)
      .attr("transform", function(d) {
-        return "translate(" + offset_label(d, this.getComputedTextLength()) + ") rotate(" + angle(d) + ")";
+        return "translate(" + offsetLabel(d, this.getComputedTextLength()) + ") rotate(" + angle(d) + ")";
       })
       .style("text-transform", "capitalize")
        .on("click", zoomIn)
@@ -626,7 +589,7 @@ function navigate() {
 
 //---- Plotting and Animation Utilities
 
-function offset_label(d, length) {
+function offsetLabel(d, length) {
   //we have to make sure to set these before calling arc.centroid
   d.outerRadius = OUTER_RADIUS; // Set Outer Coordinate
   d.innerRadius = OUTER_RADIUS/2; // Set Inner Coordinate
@@ -690,7 +653,6 @@ function processResponse(allocationTree, resource) {
 
 function load() {
 	d3.json("/nacc/rest/for_codes", function(error, forObjects) {
-		//d3.json("/static/allocation_tree.json", function(error, allocationObjects) {
 		d3.json("/nacc/rest/allocation_tree", function(error, allocationObjects) {
 			breadCrumbs = ['*'];
 			forTitleMap = forObjects;
