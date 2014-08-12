@@ -72,6 +72,7 @@ function graphQuota(pageAreaSelector, quotaKey, usage) {
 		
 	var color = d3.scale.ordinal()
 				// Color for used quota then unused quota.
+				.domain("0", "1")
 			    .range(["#006ccf", "#f2f2f2"]);
 
 	var pie = d3.layout.pie()
@@ -121,6 +122,7 @@ function graphFieldOfResearch(pageAreaSelector, forUsage, forTranslation) {
 
 	var color = d3.scale.ordinal()
 				// for first, second and third FOR's.
+				.domain("0", "1", "2")
 				.range(["#ff0000", "#00ff00", "#0000ff"]);
 
 	var pie = d3.layout.pie()

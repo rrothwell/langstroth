@@ -42,6 +42,7 @@ function nextLevel(forCodes, children) {
 // Restructure allocation tree into a single level array of objects.
 // The tree is flattened by taking the sum of all allocations on the branch.
 function restructureAllocations(allocationTree, isCoreQuota) {
+	var colourIndex = 0;
     var dataset = [];
     var allocationCount = allocationTree.length;
     for (var allocationIndex = 0; allocationIndex < allocationCount; allocationIndex++) {
@@ -66,6 +67,7 @@ function restructureAllocations(allocationTree, isCoreQuota) {
     	}
     	allocationItem.target = name;
     	allocationItem.value = sum;
+    	allocationItem.colourIndex = colourIndex++;   // Color palette index
     	dataset.push(allocationItem);
     }    
     return dataset;
@@ -109,9 +111,9 @@ String.prototype.makeWrappable = function() {
 //---- Visualisation Constants
 
 // Chart dimensions
-var WIDTH = 960,
-    HEIGHT = 700,
-    PIE_WIDTH = 960,
+var WIDTH = 500,
+    HEIGHT = 500,
+    PIE_WIDTH = 500,
     PIE_HEIGHT = 500,
     RADIUS = Math.min(PIE_WIDTH, PIE_HEIGHT) / 2;
 
@@ -224,7 +226,8 @@ var totalText = statisticsArea.append("text")
 			var totalResource = d3.sum(dataset, function (d) {
 			  return d.value;
 			});
-			visualise(dataset, totalResource);	
+			visualise(dataset, totalResource);
+			tabulateAllocations(table, dataset, totalResource, isCoreQuota);
 	 	} else {
 	 		// Instead of zooming plot navigate to another page.
 	 		//RR 
@@ -242,7 +245,8 @@ var totalText = statisticsArea.append("text")
 			var totalResource = d3.sum(dataset, function (d) {
 			  return d.value;
 			});
-			visualise(dataset, totalResource);	
+			visualise(dataset, totalResource);
+			tabulateAllocations(table, dataset, totalResource, isCoreQuota);
 	 	}
 	}
 	
@@ -425,35 +429,6 @@ function visualise( dataset, totalResource ) {
 	// Begin text annotation.
     slices.selectAll('text').remove();
 
-	// Annotate slices with name of corresponding domain.
-    slices
-      .append("text")
-      .attr("id", function(d, i) { return 'name-plot-label-' + i; })
-      .attr("class", 'name-plot-label')
-      .text(function(d) {
-      	var label = null;
-      	if (isForCodeLevel()) {
-      		var forCode = d.data.target;
-      		label = forTitleMap[forCode].toLowerCase().abbreviate(LABEL_MAX_LENGTH) + " (" + forCode + ")";
-      	} else {
-      		label = d.data.target.abbreviate(LABEL_MAX_LENGTH + 5);
-      	}
-        return label;
-      })
-      .style("opacity", 0)
-      .attr("transform", function(d) {
-        return "translate(" + offsetLabel(d, this.getComputedTextLength()) + ") rotate(" + angle(d) + ")";
-      })
-      .style("text-transform", "capitalize")
-       .on("click", zoomIn)
-       .on("mouseover", showRelatedLabels)
-       .on("mousemove", moveRelatedLabels)
-       .on("mouseout", hideRelatedLabels)
-      .transition()
-      .duration(DURATION_FAST)
-      .style("opacity", calculateOpacity)
-      ;
-
 	// Annotate slices with virtual CPU count for corresponding domain.
     slices
       .append("text")
@@ -468,7 +443,16 @@ function visualise( dataset, totalResource ) {
       })
       .style("fill", "White")
       .style("font", "bold 12px Arial")
-      .text(function(d) { return d.data.value.toFixed(2); })
+      .text(function(d) {
+      	var label = null;
+      	if (isForCodeLevel()) {
+      		var forCode = d.data.target;
+      		label = forCode;
+      	} else {
+      		label = d.data.target.abbreviate(LABEL_MAX_LENGTH + 5);
+      	}
+        return label;
+      })
       .style("opacity", 0)
        .on("click", zoomIn)
        .on("mouseover", showRelatedLabels)
@@ -490,7 +474,7 @@ function visualise( dataset, totalResource ) {
     newSlices.append("path")
       .attr("class", 'plot-slice')
       .attr("fill", function (d, i) {
-        return color(i);
+        return color(d.data.colourIndex);
       })
       .attr('d', arc(enterClockwise))
       .each(function (d) {
@@ -510,36 +494,6 @@ function visualise( dataset, totalResource ) {
       .attrTween("d", arcTween)
 		;
 
-    // -- Text annotations second, domain names.
-    
-    newSlices
-      .append("text")
-      .attr("id", function(d, i) { return 'name-plot-label-' + i; })
-      .attr("class", 'name-plot-label')
-      .text(function(d) {
-      	var label = null;
-      	if (isForCodeLevel()) {
-      		var forCode = d.data.target;
-      		label = forTitleMap[forCode].toLowerCase().abbreviate(LABEL_MAX_LENGTH) + " (" + forCode + ")";
-      	} else {
-      		label = d.data.target.abbreviate(LABEL_MAX_LENGTH + 5);
-      	}      		
-        return label;
-      })
-    	.style("opacity", 0)
-     .attr("transform", function(d) {
-        return "translate(" + offsetLabel(d, this.getComputedTextLength()) + ") rotate(" + angle(d) + ")";
-      })
-      .style("text-transform", "capitalize")
-       .on("click", zoomIn)
-       .on("mouseover", showRelatedLabels)
-       .on("mousemove", moveRelatedLabels)
-       .on("mouseout", hideRelatedLabels)
-      .transition()
-      .duration(DURATION_FAST)
-      .style("opacity", calculateOpacity)
-		;
-
     // -- Text annotations third, virtual CPU count for corresponding domain.
     newSlices
     	.append("text")
@@ -554,7 +508,16 @@ function visualise( dataset, totalResource ) {
       })
       .style("fill", "White")
       .style("font", "bold 12px Arial")
-      .text(function(d) { return d.data.value.toFixed(2); })
+      .text(function(d) {
+      	var label = null;
+      	if (isForCodeLevel()) {
+      		var forCode = d.data.target;
+      		label = forCode;
+      	} else {
+      		label = d.data.target.abbreviate(LABEL_MAX_LENGTH + 5);
+      	}      		
+        return label;
+      })
       .style("opacity", 0)
        .on("click", zoomIn)
        .on("mouseover", showRelatedLabels)
@@ -618,6 +581,8 @@ function navigate() {
 				  return d.value;
 				});
 				visualise(dataset, totalResource);
+				tabulateAllocations(table, dataset, totalResource, isCoreQuota);
+
 			}	
         });
   }
@@ -692,9 +657,11 @@ function load() {
 			breadCrumbs = ['*'];
 			forTitleMap = forObjects;
 			allocationTree = allocationObjects.children;
+			var isCoreQuota = selectedCoreQuota();
 			var resource = {};
 			var dataset = processResponse(allocationTree, resource);
 			visualise(dataset, resource.total);	
+			tabulateAllocations(table, dataset, resource.total, isCoreQuota);
 		});
 	});
 }
@@ -708,9 +675,11 @@ function change() {
 	$(this).addClass('active');
 	var route = breadCrumbs.slice(1).reverse();
 	var children = traverseHierarchy(route, allocationTree);
+	var isCoreQuota = selectedCoreQuota();
 	var resource = {};
 	var dataset = processResponse(children, resource);
 	visualise(dataset, resource.total);	
+	tabulateAllocations(table, dataset, resource.total, isCoreQuota);
 }
 
 d3.selectAll("button").on("click", change);

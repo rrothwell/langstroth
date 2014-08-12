@@ -27,8 +27,11 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-12">
+			<div class="col-md-6">
 				<div id="plot-area" class="plot-alignment"></div>
+			</div>
+			<div class="col-md-6">
+				<div id="table-area" class="table-alignment"></div>
 			</div>
 		</div>
 {% endblock %}
@@ -36,6 +39,7 @@
 {% block extra_script %}
 	<script src="{{ STATIC_URL }}js/d3.v3.js"></script>
 	<script src="{{ STATIC_URL }}js/allocations_pie.js"></script>
+	<script src="{{ STATIC_URL }}js/for_table.js"></script>
 {% endblock %}
 	
 	

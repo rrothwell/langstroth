@@ -30,6 +30,10 @@ ul.breadcrumb {
 	text-align: center;
 }
 
+.table-alignment {
+	text-align: center;
+}
+
 .opaque-plot-label {
 	opacity:0.5;
 }
