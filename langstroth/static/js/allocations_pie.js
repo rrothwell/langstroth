@@ -262,59 +262,59 @@ var totalText = statisticsArea.append("text")
 	function calculateOpacity0(d) { 
 		return isCramped(d) ? 1.0 : 0.0 ; 
 	}
-
-	function showRelatedNameLabel(d, i) { 
-		var relatedNameLabels = d3.select('#name-plot-label-' + i);
-		var relatedNameLabel = relatedNameLabels[0][0];
-		if (relatedNameLabel) {
-			relatedNameLabel.style.opacity = '1.0';
-		} else {
-			if ( window.console && window.console.log ) {
-				console.log('relatedNameLabel was null');
-			}		
-		}
-	}
-
-	function hideRelatedNameLabel(d, i) { 
-		var relatedNameLabels = d3.select('#name-plot-label-' + i);
-		var relatedNameLabel = relatedNameLabels[0][0];
-		if (relatedNameLabel) {
-			relatedNameLabel.style.opacity = calculateOpacity(d);
-		} else {
-		// Happens just after clicking on 
-			if ( window.console && window.console.log ) {
-				console.log('relatedNameLabel was null');
-			}		
-		}
-	}
-
-	function showRelatedValueLabel(d, i) { 
-		var relatedValueLabels = d3.select('#value-plot-label-' + i);
-		var relatedValueLabel = relatedValueLabels[0][0];
-		if (relatedValueLabel) {
-			relatedValueLabel.style.opacity = '1.0';
-		} else {
-			if ( window.console && window.console.log ) {
-				console.log('relatedValueLabel was null');
-			}		
-		}
-	}
-
-	function hideRelatedValueLabel(d, i) { 
-		var relatedValueLabels = d3.select('#value-plot-label-' + i);
-		var relatedValueLabel = relatedValueLabels[0][0];
-		if (relatedValueLabel) {
-			relatedValueLabel.style.opacity = calculateOpacity0(d);
-		} else {
-			if ( window.console && window.console.log ) {
-				console.log('relatedValueLabel was null');
-			}		
-		}
-	}
+//
+//	function showRelatedNameLabel(d, i) { 
+//		var relatedNameLabels = d3.select('#name-plot-label-' + i);
+//		var relatedNameLabel = relatedNameLabels[0][0];
+//		if (relatedNameLabel) {
+//			relatedNameLabel.style.opacity = '1.0';
+//		} else {
+//			if ( window.console && window.console.log ) {
+//				console.log('relatedNameLabel was null');
+//			}		
+//		}
+//	}
+//
+//	function hideRelatedNameLabel(d, i) { 
+//		var relatedNameLabels = d3.select('#name-plot-label-' + i);
+//		var relatedNameLabel = relatedNameLabels[0][0];
+//		if (relatedNameLabel) {
+//			relatedNameLabel.style.opacity = calculateOpacity(d);
+//		} else {
+//		// Happens just after clicking on 
+//			if ( window.console && window.console.log ) {
+//				console.log('relatedNameLabel was null');
+//			}		
+//		}
+//	}
+//
+//	function showRelatedValueLabel(d, i) { 
+//		var relatedValueLabels = d3.select('#value-plot-label-' + i);
+//		var relatedValueLabel = relatedValueLabels[0][0];
+//		if (relatedValueLabel) {
+//			relatedValueLabel.style.opacity = '1.0';
+//		} else {
+//			if ( window.console && window.console.log ) {
+//				console.log('relatedValueLabel was null');
+//			}		
+//		}
+//	}
+//
+//	function hideRelatedValueLabel(d, i) { 
+//		var relatedValueLabels = d3.select('#value-plot-label-' + i);
+//		var relatedValueLabel = relatedValueLabels[0][0];
+//		if (relatedValueLabel) {
+//			relatedValueLabel.style.opacity = calculateOpacity0(d);
+//		} else {
+//			if ( window.console && window.console.log ) {
+//				console.log('relatedValueLabel was null');
+//			}		
+//		}
+//	}
 
 	function showRelatedLabels(d, i) { 
-		showRelatedNameLabel(d, i);
-		showRelatedValueLabel(d, i);
+//		showRelatedNameLabel(d, i);
+//		showRelatedValueLabel(d, i);
 		if (isForCodeLevel()) {
 			showFORDescription(d);
 		} else {
@@ -330,8 +330,8 @@ var totalText = statisticsArea.append("text")
 	}
 
 	function hideRelatedLabels(d, i) { 
-		hideRelatedNameLabel(d, i);
-		hideRelatedValueLabel(d, i);
+//		hideRelatedNameLabel(d, i);
+//		hideRelatedValueLabel(d, i);
 		toolTip.style("visibility", "hidden");
 	}
 
@@ -683,3 +683,5 @@ function change() {
 }
 
 d3.selectAll("button").on("click", change);
+
+$("#plot-area").stick_in_parent();
