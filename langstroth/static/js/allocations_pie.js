@@ -684,4 +684,5 @@ function change() {
 
 d3.selectAll("button").on("click", change);
 
-$("#plot-area").stick_in_parent();
+var plotArea = $("#plot-area");
+plotArea.stick_in_parent({parent: "#inner-plot-container", inner_scrolling: true, offset_top:0});

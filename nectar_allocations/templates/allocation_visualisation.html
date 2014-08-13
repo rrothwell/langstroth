@@ -27,8 +27,10 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-6">
-				<div id="plot-area" class="plot-alignment"></div>
+			<div  class="col-md-6"   id="outer-plot-container" style="height:0px">
+				<div  id="inner-plot-container" style="height:0px">
+					<div id="plot-area" class="plot-alignment"></div>
+				</div>
 			</div>
 			<div class="col-md-6">
 				<div id="table-area" class="table-alignment"></div>
@@ -38,7 +40,6 @@
 	
 {% block extra_script %}
 	<script src="{{ STATIC_URL }}js/d3.v3.js"></script>
-	<script src="{{ STATIC_URL }}js/jquery.sticky-kit.min.js"></script>
 	<script src="{{ STATIC_URL }}js/allocations_pie.js"></script>
 	<script src="{{ STATIC_URL }}js/for_table.js"></script>
 {% endblock %}

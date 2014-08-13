@@ -147,9 +147,13 @@ function tabulateAllocations(table, dataset, total, isCoreQuota) {
 	var oldCells = oldRows.selectAll("td");
 	oldCells.remove();
 	oldRows.remove();
-
+	
+	var containerHeight = $("#table-area").height() + RADIUS * 2;
+	$("#inner-plot-container, #outer-plot-container").height(containerHeight);
+	$(document.body).trigger("sticky_kit:recalc");
 }
 
 var table = buildTable("#table-area");
+
 
 
