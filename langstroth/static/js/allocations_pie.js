@@ -5,8 +5,11 @@
 // Breadcrumbs - keep track of the current hierarchy level.
 // Made up of an array of FOR codes.
 var breadCrumbs = ['*'];
+var color = d3.scale.category20();
+var paletteStack = [color];
 var allocationTree = {};
 var forTitleMap = {};
+
 
 
 // Is this the level for FOR codes or projects.
@@ -106,6 +109,10 @@ String.prototype.makeWrappable = function() {
 	return labelStr;
 };
 
+Array.prototype.tos = function() {
+	return this[this.length - 1];
+};
+
 //==== Data visualisation
 
 //---- Visualisation Constants
@@ -138,8 +145,6 @@ var enterAntiClockwise = {
 
 var x = d3.scale.linear()
       .range([0, 2 * Math.PI]);
-
-var color = d3.scale.category20();
 
 var TEXT_HEIGHT_ALLOWANCE = .1;
 
@@ -226,6 +231,12 @@ var totalText = statisticsArea.append("text")
 			var totalResource = d3.sum(dataset, function (d) {
 			  return d.value;
 			});
+			var currentPalette = paletteStack.tos();
+			var currentColour = currentPalette(p.data.colourIndex);
+			var newPalette = d3.scale.linear()
+								.domain([0, dataset.length])
+								.range([currentColour, "white"]);
+			paletteStack.push(newPalette);
 			visualise(dataset, totalResource);
 			tabulateAllocations(table, dataset, totalResource, isCoreQuota);
 	 	} else {
@@ -245,6 +256,7 @@ var totalText = statisticsArea.append("text")
 			var totalResource = d3.sum(dataset, function (d) {
 			  return d.value;
 			});
+			paletteStack.pop();
 			visualise(dataset, totalResource);
 			tabulateAllocations(table, dataset, totalResource, isCoreQuota);
 	 	}
@@ -418,6 +430,9 @@ function visualise( dataset, totalResource ) {
     
     slices.select('path')
       .attr("class", 'plot-slice')
+      .attr("fill", function (d, i) {
+        return paletteStack.tos()(d.data.colourIndex);
+      })
        .on("click", zoomIn)
        .on("mouseover", showRelatedLabels)
        .on("mousemove", moveRelatedLabels)
@@ -474,7 +489,7 @@ function visualise( dataset, totalResource ) {
     newSlices.append("path")
       .attr("class", 'plot-slice')
       .attr("fill", function (d, i) {
-        return color(d.data.colourIndex);
+        return paletteStack.tos()(d.data.colourIndex);
       })
       .attr('d', arc(enterClockwise))
       .each(function (d) {
