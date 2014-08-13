@@ -220,11 +220,11 @@ var totalText = statisticsArea.append("text")
 	.style("text-anchor", "middle");
 
 
-	 function zoomIn(p) {
-	 	if (isForCodeLevel()) {
-			var forCode = p.data.target;
-	 		breadCrumbs.push(forCode);
-	 		var route = breadCrumbs.slice(1).reverse();
+	function zoomIn(data) {
+		if (isForCodeLevel()) {
+			var forCode = data.target;
+			breadCrumbs.push(forCode);
+			var route = breadCrumbs.slice(1).reverse();
 			var children = traverseHierarchy(route, allocationTree);
 			var isCoreQuota = selectedCoreQuota();
 			var dataset = restructureAllocations(children, isCoreQuota);
@@ -232,19 +232,24 @@ var totalText = statisticsArea.append("text")
 			  return d.value;
 			});
 			var currentPalette = paletteStack.tos();
-			var currentColour = currentPalette(p.data.colourIndex);
+			var currentColour = currentPalette(data.colourIndex);
 			var newPalette = d3.scale.linear()
 								.domain([0, dataset.length])
 								.range([currentColour, "white"]);
 			paletteStack.push(newPalette);
 			visualise(dataset, totalResource);
 			tabulateAllocations(table, dataset, totalResource, isCoreQuota);
-	 	} else {
-	 		// Instead of zooming plot navigate to another page.
-	 		//RR 
-	 		window.location.href = '/nacc/allocations/' + p.data.id + '/project';
-	 	}
-	  }
+		} else {
+			// Instead of zooming plot navigate to another page.
+			//RR 
+			window.location.href = '/nacc/allocations/' + data.id + '/project';
+		}
+	 }
+	
+	function zoomInPie(p) {
+		var data = p.data;
+		zoomIn(data);
+	 }
 
 	function zoomOut(p) { 
 	 	if (breadCrumbs.length > 1) {
@@ -433,7 +438,7 @@ function visualise( dataset, totalResource ) {
       .attr("fill", function (d, i) {
         return paletteStack.tos()(d.data.colourIndex);
       })
-       .on("click", zoomIn)
+       .on("click", zoomInPie)
        .on("mouseover", showRelatedLabels)
        .on("mousemove", moveRelatedLabels)
        .on("mouseout", hideRelatedLabels)
@@ -469,7 +474,7 @@ function visualise( dataset, totalResource ) {
         return label;
       })
       .style("opacity", 0)
-       .on("click", zoomIn)
+       .on("click", zoomInPie)
        .on("mouseover", showRelatedLabels)
        .on("mousemove", moveRelatedLabels)
        .on("mouseout", hideRelatedLabels)
@@ -491,6 +496,8 @@ function visualise( dataset, totalResource ) {
       .attr("fill", function (d, i) {
         return paletteStack.tos()(d.data.colourIndex);
       })
+      .style('stroke', 'white')
+      .style('stroke-width', 1)
       .attr('d', arc(enterClockwise))
       .each(function (d) {
         this._current = {
@@ -500,7 +507,7 @@ function visualise( dataset, totalResource ) {
           endAngle: enterAntiClockwise.endAngle
         };        
       })
-      .on("click", zoomIn)
+      .on("click", zoomInPie)
        .on("mouseover", showRelatedLabels)
        .on("mousemove", moveRelatedLabels)
        .on("mouseout", hideRelatedLabels)
@@ -534,7 +541,7 @@ function visualise( dataset, totalResource ) {
         return label;
       })
       .style("opacity", 0)
-       .on("click", zoomIn)
+       .on("click", zoomInPie)
        .on("mouseover", showRelatedLabels)
        .on("mousemove", moveRelatedLabels)
        .on("mouseout", hideRelatedLabels)
@@ -595,6 +602,7 @@ function navigate() {
 				var totalResource = d3.sum(dataset, function (d) {
 				  return d.value;
 				});
+				paletteStack = paletteStack.slice(0, i + 1);
 				visualise(dataset, totalResource);
 				tabulateAllocations(table, dataset, totalResource, isCoreQuota);
 
