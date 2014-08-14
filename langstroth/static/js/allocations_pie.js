@@ -5,8 +5,8 @@
 // Breadcrumbs - keep track of the current hierarchy level.
 // Made up of an array of FOR codes.
 var breadCrumbs = ['*'];
-var color = d3.scale.category20();
-var paletteStack = [color];
+var colorPalette = d3.scale.category20();
+var paletteStack = [colorPalette];
 var allocationTree = {};
 var forTitleMap = {};
 
@@ -234,7 +234,7 @@ var totalText = statisticsArea.append("text")
 			var currentPalette = paletteStack.tos();
 			var currentColour = currentPalette(data.colourIndex);
 			var newPalette = d3.scale.linear()
-								.domain([0, dataset.length])
+								.domain([0, dataset.length + 10])
 								.range([currentColour, "white"]);
 			paletteStack.push(newPalette);
 			visualise(dataset, totalResource);
@@ -279,59 +279,8 @@ var totalText = statisticsArea.append("text")
 	function calculateOpacity0(d) { 
 		return isCramped(d) ? 1.0 : 0.0 ; 
 	}
-//
-//	function showRelatedNameLabel(d, i) { 
-//		var relatedNameLabels = d3.select('#name-plot-label-' + i);
-//		var relatedNameLabel = relatedNameLabels[0][0];
-//		if (relatedNameLabel) {
-//			relatedNameLabel.style.opacity = '1.0';
-//		} else {
-//			if ( window.console && window.console.log ) {
-//				console.log('relatedNameLabel was null');
-//			}		
-//		}
-//	}
-//
-//	function hideRelatedNameLabel(d, i) { 
-//		var relatedNameLabels = d3.select('#name-plot-label-' + i);
-//		var relatedNameLabel = relatedNameLabels[0][0];
-//		if (relatedNameLabel) {
-//			relatedNameLabel.style.opacity = calculateOpacity(d);
-//		} else {
-//		// Happens just after clicking on 
-//			if ( window.console && window.console.log ) {
-//				console.log('relatedNameLabel was null');
-//			}		
-//		}
-//	}
-//
-//	function showRelatedValueLabel(d, i) { 
-//		var relatedValueLabels = d3.select('#value-plot-label-' + i);
-//		var relatedValueLabel = relatedValueLabels[0][0];
-//		if (relatedValueLabel) {
-//			relatedValueLabel.style.opacity = '1.0';
-//		} else {
-//			if ( window.console && window.console.log ) {
-//				console.log('relatedValueLabel was null');
-//			}		
-//		}
-//	}
-//
-//	function hideRelatedValueLabel(d, i) { 
-//		var relatedValueLabels = d3.select('#value-plot-label-' + i);
-//		var relatedValueLabel = relatedValueLabels[0][0];
-//		if (relatedValueLabel) {
-//			relatedValueLabel.style.opacity = calculateOpacity0(d);
-//		} else {
-//			if ( window.console && window.console.log ) {
-//				console.log('relatedValueLabel was null');
-//			}		
-//		}
-//	}
 
 	function showRelatedLabels(d, i) { 
-//		showRelatedNameLabel(d, i);
-//		showRelatedValueLabel(d, i);
 		if (isForCodeLevel()) {
 			showFORDescription(d);
 		} else {
@@ -347,8 +296,6 @@ var totalText = statisticsArea.append("text")
 	}
 
 	function hideRelatedLabels(d, i) { 
-//		hideRelatedNameLabel(d, i);
-//		hideRelatedValueLabel(d, i);
 		toolTip.style("visibility", "hidden");
 	}
 
@@ -611,26 +558,6 @@ function navigate() {
   }
 
 //---- Plotting and Animation Utilities
-
-function offsetLabel(d, length) {
-  //we have to make sure to set these before calling arc.centroid
-  d.outerRadius = OUTER_RADIUS; // Set Outer Coordinate
-  d.innerRadius = OUTER_RADIUS/2; // Set Inner Coordinate
-  var center = arc.centroid(d), // gives you the center point of the slice
-      x = center[0],
-      y = center[1],
-      h = Math.sqrt(x*x + y*y),
-      blx = x/h * 250,
-      bly = y/h * 250,
-      lx = x/h * (250 + length),
-      ly = y/h * (250 + length);
-  var a = (d.startAngle + d.endAngle) * 90 / Math.PI - 90;
-  if (a > 90) {
-    return lx + "," + ly;
-  } else  {
-    return blx + "," + bly;
-  }
-}
 
 // Computes the angle of an arc, converting from radians to degrees.
 function angle(d) {

@@ -1,10 +1,19 @@
 ////// FOR Table for NeCTAR Allocations
 
-//==== FOR Table
+//==== FOR/Project Table
 
-var headings = {
-	"for_code" : "Code",
-	"for_name" : "Name",
+var forHeadings = {
+	"caption" : "Fields Of Research",
+	"code" : "Code",
+	"name" : "Name",
+	"percent" : "%",
+	"count" : "Count",
+};
+
+var projectHeadings = {
+	"caption" : "Projects",
+	"code" : "Project",
+	"name" : "Institution",
 	"percent" : "%",
 	"count" : "Count",
 };
@@ -15,7 +24,8 @@ var headings = {
 function buildTable(pageAreaSelector, isCoreQuota) {
 	// Define the table with heading.
 	var table = d3.select(pageAreaSelector).append("table")
-					.attr("class", "table-striped table-bordered table-condensed");	
+					.attr("class", "for-projects table-striped table-bordered table-condensed");	
+	var caption = table.append("caption").text(forHeadings["caption"]);
 	var thead = table.append("thead");
 	var tbody = table.append("tbody");
 	
@@ -24,15 +34,15 @@ function buildTable(pageAreaSelector, isCoreQuota) {
 	headerRow.append("th")
 		.attr("class", "col0")
 		.style("min-width", "20px")
-		.text(headings["for_code"]);
+		.text(forHeadings["code"]);
 	headerRow.append("th")
 		.attr("class", "col1")
 		.style("min-width", "20px")
-		.text(headings["for_name"]);
+		.text(forHeadings["name"]);
 	headerRow.append("th")
 		.attr("class", "col2")
 		.style("min-width", "20px")
-		.text(headings["percent"]);
+		.text(forHeadings["percent"]);
 	headerRow.append("th")
 		.attr("class", "col3")
 		.style("min-width", "20px")
@@ -50,7 +60,27 @@ function tabulateAllocations(table, dataset, total, isCoreQuota) {
 
 	// Adjust the header
 	
+	var caption = table.select("caption")
+		.text(function(row) { 
+			return isForCodeLevel() ? forHeadings["caption"] : projectHeadings["caption"]; 
+		});
+	
 	var thead = table.select("thead");
+	
+	thead.select("th.col0")
+		.text(function(row) { 
+				return isForCodeLevel() ? forHeadings["code"] : projectHeadings["code"]; 
+			});
+	
+	thead.select("th.col1")
+		.text(function(row) { 
+				return isForCodeLevel() ? forHeadings["name"] : projectHeadings["name"]; 
+			});
+	
+	thead.select("th.col2")
+		.text(function(row) { 
+				return "%"; 
+			});
 	
 	thead.select("th.col3")
 		.text(function(row) { 
@@ -69,13 +99,18 @@ function tabulateAllocations(table, dataset, total, isCoreQuota) {
 				return paletteStack.tos()(d.colourIndex);
 		})
 		.text(function(row) { 
-				return row["target"]; 
+				return isForCodeLevel() ? row["target"] : row["projectName"] ; 
 			});
 	
 	rows.select("td.col1")
+		.style("text-transform", isForCodeLevel() ? "capitalize" : "")
 		.text(function(row) { 
-				var forCode = row["target"];
-				return forTitleMap[forCode].toLowerCase(); 
+				if (isForCodeLevel()) {
+					var forCode = row["target"];
+					return forTitleMap[forCode].toLowerCase(); 
+				} else {
+					return row["institutionName"];
+				}
 			});
 	
 	rows.select("td.col2")
@@ -110,17 +145,21 @@ function tabulateAllocations(table, dataset, total, isCoreQuota) {
 		})
 		.style("color", "white")
 		.text(function(row) { 
-				return row["target"]; 
+				return isForCodeLevel() ? row["target"] : row["projectName"] ; 
 			});
 	
 	newRows.append("td")
 		.attr("class", "col1")
 		.style("min-width", "20px")
 		.style("text-align", "left")
-		.style("text-transform", "capitalize")
+		.style("text-transform", isForCodeLevel() ? "capitalize" : "")
 		.text(function(row) { 
+			if (isForCodeLevel()) {
 				var forCode = row["target"];
 				return forTitleMap[forCode].toLowerCase(); 
+			} else {
+				return row["institutionName"];
+			}
 			});
 	
 	newRows.append("td")

@@ -34,6 +34,11 @@ ul.breadcrumb {
 	text-align: center;
 }
 
+table.for-projects caption{
+	font-size: 24px;
+	font-weight: 500;
+}
+
 .opaque-plot-label {
 	opacity:0.5;
 }
