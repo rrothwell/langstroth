@@ -21,6 +21,30 @@ var projectHeadings = {
 //==== HTML Table For Allocations for FOR Codes.
 // Populated on page load. Dynamic update after page load is not supported.
 
+function inflateChartSegment(d, i) { 
+    var segment = d3.selectAll("path").filter(function(row) { 
+			return (row.data.colourIndex == d.colourIndex);
+    	});
+		segment.style("stroke", HILITE_SEGMENT_COLOUR)
+		.style("stroke-width", HILITE_SEGMENT_WIDTH)
+		.attr("transform", function(row) {
+		    var bisectorAngle = (row.endAngle + row.startAngle) / 2.0 + -Math.PI / 2;
+		    var deltaX = 5 * Math.cos(bisectorAngle);
+		    var deltaY = 5 * Math.sin(bisectorAngle);
+			return "translate(" + deltaX + "," + deltaY + ")";
+		});
+}
+
+function deflateChartSegment(d, i) { 
+    var segment = d3.selectAll("path").filter(function(row) { 
+		return (row.data.colourIndex == d.colourIndex);
+	});
+	segment.style("stroke", UNHILITE_SEGMENT_COLOUR)
+		.style("stroke-width", UNHILITE_SEGMENT_WIDTH)
+		.attr("transform", "translate(0, 0)");
+}
+
+
 function buildTable(pageAreaSelector, isCoreQuota) {
 	// Define the table with heading.
 	var table = d3.select(pageAreaSelector).append("table")
@@ -134,8 +158,11 @@ function tabulateAllocations(table, dataset, total, isCoreQuota) {
 
 	// Add new data records
 
-	var newRows = rows.enter().append("tr");
-	newRows.attr('data-row',function(d,i){return i; });
+	var newRows = rows.enter()
+		.append("tr")
+		.attr('data-row',function(d,i){return i; })
+		.on("mouseover", inflateChartSegment)
+		.on("mouseout", deflateChartSegment);
 
 	newRows.append("td")
 		.attr("class", "col0")
