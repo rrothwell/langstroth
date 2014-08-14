@@ -16,9 +16,10 @@ def allocation_visualisation_page(request):
     return render(request, "allocation_visualisation.html", context)
 
 def project_details_page(request, allocation_request_id):
+    allocation_dict = AllocationRequest.project_from_allocation_request_id(allocation_request_id)
     context = {
-        "title": "Project Details",
-        "tagline": "",
+        "title": "Project",
+        "tagline": allocation_dict['project_name'].replace('_', ' '),
         "allocation_request_id": allocation_request_id}
     return render(request, "project_details.html", context)
 
