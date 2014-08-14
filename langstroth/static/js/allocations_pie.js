@@ -11,7 +11,6 @@ var allocationTree = {};
 var forTitleMap = {};
 
 
-
 // Is this the level for FOR codes or projects.
 function isForCodeLevel() {
 	return breadCrumbs.length < 4;
@@ -94,6 +93,7 @@ function nextLevelSum(children, isCoreQuota) {
 
 //==== String utilities
 
+// String abbreviate to set length and signify abbreviation by adding ellipsis.
 String.prototype.abbreviate = function(charCount) {
 	var labelStr = this;
 	if (this.length > charCount) {
@@ -102,6 +102,7 @@ String.prototype.abbreviate = function(charCount) {
 	return labelStr;
 };
 
+// String remove underscores so long string will wrap.
 String.prototype.makeWrappable = function() {
 	var labelStr = this;
     var regex = new RegExp("_", "g");
@@ -109,6 +110,7 @@ String.prototype.makeWrappable = function() {
 	return labelStr;
 };
 
+// Array return top-of-stack method.
 Array.prototype.tos = function() {
 	return this[this.length - 1];
 };
@@ -152,6 +154,14 @@ var LABEL_MAX_LENGTH = 10;
 
 var ROTATION_OFFSET = 0;
 
+var HILITE_SEGMENT_COLOUR = "blue";
+var HILITE_TEXT_COLOUR = "white";
+var UNHILITE_SEGMENT_COLOUR = "white";
+var UNHILITE_TEXT_COLOUR = "";
+var HILITE_SEGMENT_WIDTH = "2";
+var UNHILITE_SEGMENT_WIDTH = "1";
+var UNHILITE_CELL_COLOUR = "";
+
 //---- Popup on mouseover for sectors and table rows.
 
 var toolTip = d3.select("body")
@@ -167,6 +177,7 @@ var toolTip = d3.select("body")
 // A div with id="plot-area" is located on the web page 
 // and then populated with these chart elements.
 
+// TODO RR: remove chart rotation. Failed experiment.
 var plotGroup = d3.select("#plot-area").append("svg")
       .attr("width", WIDTH)
       .attr("height", HEIGHT)
@@ -241,7 +252,6 @@ var totalText = statisticsArea.append("text")
 			tabulateAllocations(table, dataset, totalResource, isCoreQuota);
 		} else {
 			// Instead of zooming plot navigate to another page.
-			//RR 
 			window.location.href = '/nacc/allocations/' + data.id + '/project';
 		}
 	 }
@@ -261,7 +271,9 @@ var totalText = statisticsArea.append("text")
 			var totalResource = d3.sum(dataset, function (d) {
 			  return d.value;
 			});
+			// Restore original palette.
 			paletteStack.pop();
+			// Display pie chart and table.
 			visualise(dataset, totalResource);
 			tabulateAllocations(table, dataset, totalResource, isCoreQuota);
 	 	}
@@ -281,6 +293,18 @@ var totalText = statisticsArea.append("text")
 	}
 
 	function showRelatedLabels(d, i) { 
+	    this.style.stroke = HILITE_SEGMENT_COLOUR;
+	    this.style["stroke-width"] = HILITE_SEGMENT_WIDTH;
+	    var bisectorAngle = (d.endAngle + d.startAngle) / 2.0 + -Math.PI / 2;
+	    var deltaX = 5 * Math.cos(bisectorAngle);
+	    var deltaY = 5 * Math.sin(bisectorAngle);
+	    d3.select(this).attr("transform", "translate(" + deltaX + "," + deltaY + ")");
+		table.selectAll("td.col0").each(function(row) { 
+				if (row.colourIndex == d.data.colourIndex) {
+					$(this).siblings().css('background-color', HILITE_SEGMENT_COLOUR);
+					$(this).siblings().css('color', HILITE_TEXT_COLOUR);
+				}; 
+			});
 		if (isForCodeLevel()) {
 			showFORDescription(d);
 		} else {
@@ -296,6 +320,15 @@ var totalText = statisticsArea.append("text")
 	}
 
 	function hideRelatedLabels(d, i) { 
+	    this.style.stroke = UNHILITE_SEGMENT_COLOUR;
+	    this.style["stroke-width"] = UNHILITE_SEGMENT_WIDTH;
+	    d3.select(this).attr("transform", "translate(0, 0)");
+		table.selectAll("td.col0").each(function(row) { 
+			if (row.colourIndex == d.data.colourIndex) {
+				$(this).siblings().css('background-color', UNHILITE_CELL_COLOUR);
+				$(this).siblings().css('color', UNHILITE_TEXT_COLOUR);
+			}; 
+		});
 		toolTip.style("visibility", "hidden");
 	}
 
@@ -381,14 +414,9 @@ function visualise( dataset, totalResource ) {
     slices = plotGroup.selectAll("g.slice").data(nodes);
     
     slices.select('path')
-      .attr("class", 'plot-slice')
       .attr("fill", function (d, i) {
         return paletteStack.tos()(d.data.colourIndex);
       })
-       .on("click", zoomInPie)
-       .on("mouseover", showRelatedLabels)
-       .on("mousemove", moveRelatedLabels)
-       .on("mouseout", hideRelatedLabels)
       .transition()
       .duration(DURATION)
       .attrTween("d", arcTween);
@@ -399,8 +427,6 @@ function visualise( dataset, totalResource ) {
 	// Annotate slices with virtual CPU count for corresponding domain.
     slices
       .append("text")
-      .attr("id", function(d, i) { return 'value-plot-label-' + i; })
-      .attr("class", 'value-plot-label')
       .attr("dy", ".35em")
       .attr("text-anchor", "middle")
       .attr("transform", function(d) {
@@ -422,9 +448,6 @@ function visualise( dataset, totalResource ) {
       })
       .style("opacity", 0)
        .on("click", zoomInPie)
-       .on("mouseover", showRelatedLabels)
-       .on("mousemove", moveRelatedLabels)
-       .on("mouseout", hideRelatedLabels)
       .transition()
       .duration(DURATION_FAST)
       .style("opacity", calculateOpacity0);
@@ -443,8 +466,8 @@ function visualise( dataset, totalResource ) {
       .attr("fill", function (d, i) {
         return paletteStack.tos()(d.data.colourIndex);
       })
-      .style('stroke', 'white')
-      .style('stroke-width', 1)
+      .style('stroke', UNHILITE_SEGMENT_COLOUR)
+      .style('stroke-width', UNHILITE_SEGMENT_WIDTH)
       .attr('d', arc(enterClockwise))
       .each(function (d) {
         this._current = {
@@ -489,9 +512,6 @@ function visualise( dataset, totalResource ) {
       })
       .style("opacity", 0)
        .on("click", zoomInPie)
-       .on("mouseover", showRelatedLabels)
-       .on("mousemove", moveRelatedLabels)
-       .on("mouseout", hideRelatedLabels)
       .transition()
       .duration(DURATION_FAST)
       .style("opacity", calculateOpacity0)
@@ -549,6 +569,7 @@ function navigate() {
 				var totalResource = d3.sum(dataset, function (d) {
 				  return d.value;
 				});
+				// Restore original palette.
 				paletteStack = paletteStack.slice(0, i + 1);
 				visualise(dataset, totalResource);
 				tabulateAllocations(table, dataset, totalResource, isCoreQuota);

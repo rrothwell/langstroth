@@ -24,7 +24,7 @@ var projectHeadings = {
 function buildTable(pageAreaSelector, isCoreQuota) {
 	// Define the table with heading.
 	var table = d3.select(pageAreaSelector).append("table")
-					.attr("class", "for-projects table-striped table-bordered table-condensed");	
+					.attr("class", "for-projects table-striped table-bordered table-condensed table-hover");	
 	var caption = table.append("caption").text(forHeadings["caption"]);
 	var thead = table.append("thead");
 	var tbody = table.append("tbody");
