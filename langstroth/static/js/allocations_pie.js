@@ -258,6 +258,7 @@ var totalText = statisticsArea.append("text")
 	
 	function zoomInPie(p) {
 		var data = p.data;
+		_hideRelatedLabels(this, data);
 		zoomIn(data);
 	 }
 
@@ -305,12 +306,12 @@ var totalText = statisticsArea.append("text")
 					$(this).siblings().css('color', HILITE_TEXT_COLOUR);
 				}; 
 			});
-		if (isForCodeLevel()) {
-			showFORDescription(d);
-		} else {
-			showProjectSummary(d);
-		}
-		toolTip.style("visibility", "visible");
+//		if (isForCodeLevel()) {
+//			showFORDescription(d);
+//		} else {
+//			showProjectSummary(d);
+//		}
+//		toolTip.style("visibility", "visible");
 	}
 
 	function moveRelatedLabels(d, i) { 
@@ -319,17 +320,21 @@ var totalText = statisticsArea.append("text")
 		toolTip.style("top", top).style("left", left);
 	}
 
-	function hideRelatedLabels(d, i) { 
-	    this.style.stroke = UNHILITE_SEGMENT_COLOUR;
-	    this.style["stroke-width"] = UNHILITE_SEGMENT_WIDTH;
-	    d3.select(this).attr("transform", "translate(0, 0)");
+	function _hideRelatedLabels(self, data) {
+		self.style.stroke = UNHILITE_SEGMENT_COLOUR;
+		self.style["stroke-width"] = UNHILITE_SEGMENT_WIDTH;
+	    d3.select(self).attr("transform", "translate(0, 0)");
 		table.selectAll("td.col0").each(function(row) { 
-			if (row.colourIndex == d.data.colourIndex) {
+			if (row.colourIndex == data.colourIndex) {
 				$(this).siblings().css('background-color', UNHILITE_CELL_COLOUR);
 				$(this).siblings().css('color', UNHILITE_TEXT_COLOUR);
 			}; 
 		});
 		toolTip.style("visibility", "hidden");
+	}
+
+	function hideRelatedLabels(d) {
+		_hideRelatedLabels(this, d.data);
 	}
 
 	//---- Popup showing project summary.

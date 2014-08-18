@@ -35,7 +35,7 @@ function inflateChartSegment(d, i) {
 		});
 }
 
-function deflateChartSegment(d, i) { 
+function deflateChartSegment(d) { 
     var segment = d3.selectAll("path").filter(function(row) { 
 		return (row.data.colourIndex == d.colourIndex);
 	});
@@ -43,6 +43,13 @@ function deflateChartSegment(d, i) {
 		.style("stroke-width", UNHILITE_SEGMENT_WIDTH)
 		.attr("transform", "translate(0, 0)");
 }
+
+
+function zoomInTable(d) {
+	deflateChartSegment(d);
+	zoomIn(d);
+ }
+
 
 
 function buildTable(pageAreaSelector, isCoreQuota) {
@@ -216,7 +223,7 @@ function tabulateAllocations(table, dataset, total, isCoreQuota) {
 		.attr("class", "col4")
 		.style("text-align", "center")
 		.style("cursor", "pointer")
-		.on("click", zoomIn)
+		.on("click", zoomInTable)
 		.html("<span class='glyphicon glyphicon-zoom-in'></span>");		
 
 	// Remove old records.

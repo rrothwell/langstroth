@@ -29,7 +29,10 @@ class AllocationDBTest(TestCase):
         
     def test_find_active_allocations(self):
         allocations = AllocationRequest.find_active_allocations()
-        self.assertEquals(3, len(allocations))
+        for allocation in allocations:
+            #print allocation['last_allocation']
+            print allocation.last_allocation
+        self.assertEquals(2, len(allocations))
         
     def test_partition_active_allocations(self):
         sub_allocations = AllocationRequest.partition_active_allocations()
@@ -209,12 +212,12 @@ class AllocationDBTest(TestCase):
         expected_usecase = "The cloud instances will be used to set up quick demos for researchers at USQ to run test experiments, simulations, modelling and calculations.\r\n\r\n" 
         self.assertEquals(expected_usecase, project_summary['use_case'])
         self.assertEquals('Many users and small data sets as well as small number of users and large data sets. This will vary depending on the tests and the resesearch group.', project_summary['usage_patterns'])
-        self.assertEquals(6, project_summary['instance_quota'])
-        self.assertEquals(12, project_summary['core_quota'])
+        self.assertEquals(2, project_summary['instance_quota'])
+        self.assertEquals(4, project_summary['core_quota'])
         self.assertEquals('2014-02-17', project_summary['submit_date'])
         self.assertEquals('2014-03-24 22:01:54', project_summary['modified_time'])
-        self.assertEquals(9, project_summary['cores'])
-        self.assertEquals(5, project_summary['instances'])
+        self.assertEquals(5, project_summary['cores'])
+        self.assertEquals(3, project_summary['instances'])
         self.assertEquals('099901', project_summary['field_of_research_1'])
         self.assertEquals(60, project_summary['for_percentage_1'])
         self.assertEquals('070104', project_summary['field_of_research_2'])

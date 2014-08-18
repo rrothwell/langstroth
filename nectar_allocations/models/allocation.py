@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.db.models import Q
+from django.db.models import Max
 
 from nectar_allocations.switch import Switch
 
@@ -100,8 +101,9 @@ class AllocationRequest(models.Model):
         return domain
     
     @staticmethod
-    def find_active_allocations():      
-        return AllocationRequest.objects.filter(Q(status ='A') | Q(status ='X'))
+    def find_active_allocations():
+        return AllocationRequest.objects.filter(Q(status ='A') | Q(status ='X')).annotate(last_allocation=Max('modified_time'))      
+        #return AllocationRequest.objects.filter(Q(status ='A') | Q(status ='X'))
     
     @staticmethod
     def is_valid_for_code(potential_for_code):
@@ -240,19 +242,6 @@ class AllocationRequest(models.Model):
     def project_from_allocation_request_id(allocation_request_id):
         allocations = AllocationRequest.project_allocations_from_allocation_request_id(allocation_request_id)
         project_summary = allocations[-1]
-        total_core_count = 0
-        total_instance_count = 0
-        total_cores = 0
-        total_instances = 0
-        for allocation in allocations:
-            total_core_count += allocation['core_quota']
-            total_instance_count += allocation['instance_quota']
-            total_cores += allocation['cores']
-            total_instances += allocation['instances']
-        project_summary['core_quota'] = total_core_count
-        project_summary['instance_quota'] = total_instance_count      
-        project_summary['cores'] = total_cores
-        project_summary['instances'] = total_instances      
         return project_summary
     
     @staticmethod
