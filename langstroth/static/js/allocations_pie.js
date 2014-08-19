@@ -69,7 +69,6 @@ function restructureAllocations(allocationTree, isCoreQuota) {
     	}
     	allocationItem.target = name;
     	allocationItem.value = sum;
-    	//allocationItem.colourIndex = colourIndex++;   // Color palette index
     	dataset.push(allocationItem);
     }
 	dataset.sort(function(a, b){return b.value - a.value; });
@@ -250,8 +249,8 @@ var totalText = statisticsArea.append("text")
 			var currentPalette = paletteStack.tos();
 			var currentColour = currentPalette(data.colourIndex);
 			var newPalette = d3.scale.linear()
-								.domain([-20, dataset.length])
-								.range(["white", currentColour]);
+								.domain([0, dataset.length + 10])
+								.range([currentColour, "white"]);
 			paletteStack.push(newPalette);
 			visualise(dataset, totalResource);
 			tabulateAllocations(table, dataset, totalResource, isCoreQuota);
@@ -437,7 +436,7 @@ var totalText = statisticsArea.append("text")
 function visualise( dataset, totalResource ) {
 
 	var countLabelPrefix = selectedCoreQuota() ? "Core count: " : "Instance count: "; 
-    totalText.text(function(d) { return countLabelPrefix + totalResource.toFixed(2); });
+    totalText.text(function(d) { return countLabelPrefix + totalResource.toFixed(0); });
 
 	// Build the node list, attaching the new data.
 	var nodes = pie(dataset);
