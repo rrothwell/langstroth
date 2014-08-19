@@ -47,7 +47,7 @@ function tabulateSummary(pageAreaSelector, projectSummary, forTranslation) {
 					.append("tr");
 	
 	rows.append("th")
-		.style("min-width", "100px")
+		.style("max-width", "60px")
 		.text(function(row) { 
 				return headings[row]; 
 			});
@@ -55,32 +55,28 @@ function tabulateSummary(pageAreaSelector, projectSummary, forTranslation) {
 	rows.append("td")
 		.html(function(row) { 
 			if (row == "for_distribution") {
-				var forDistributionTable = "<table class='table table-striped table-bordered table-condensed'  style='max-width: 40em;'>";
+				var forDistributionTable = "";
 				if (projectSummary.field_of_research_1) {
 					var for1 = projectSummary.field_of_research_1; 
-					forDistributionTable += "<tr  style='line-height: 1.0;'>"
-					+ "<th style='min-width: 6em'>" + "FOR&nbsp;1:&nbsp;</th>"
-					+ "<td style='min-width: 20em'>" + forTranslation[for1] + "&nbsp;(" + for1 + ")</td>"
-					+ "<td style='max-width: 4em'>" + projectSummary.for_percentage_1 + "&nbsp;%&nbsp;</td>"
-					+ "</tr>";
+					forDistributionTable += "<div>"
+					+ "<span style='min-width: 20em'>" + forTranslation[for1] + "&nbsp;(" + for1 + ")&nbsp;</span>"
+					+ "<span style='max-width: 4em'>" + projectSummary.for_percentage_1 + "&nbsp;%&nbsp;</span>"
+					+ "</div>";
 				}
 				if (projectSummary.field_of_research_2) {
 					var for2 = projectSummary.field_of_research_2; 
-					forDistributionTable += "<tr style='line-height: 1.0;'>"
-					+ "<th style='min-width: 6em'>" + "FOR&nbsp;2:&nbsp;</th>"
-					+ "<td style='min-width: 20em'>" + forTranslation[for2] + "&nbsp;(" + for2 + ")</td>"
-					+ "<td style='max-width: 4em'>" + projectSummary.for_percentage_2 + "&nbsp;%&nbsp;</td>"
-					+ "</tr>";
+					forDistributionTable += "<div>"
+					+ "<span style='min-width: 20em'>" + forTranslation[for2] + "&nbsp;(" + for2 + ")&nbsp;</span>"
+					+ "<span style='max-width: 4em'>" + projectSummary.for_percentage_2 + "&nbsp;%&nbsp;</span>"
+					+ "</div>";
 				}
 				if (projectSummary.field_of_research_3) {
 					var for3 = projectSummary.field_of_research_3; 
-					forDistributionTable += "<tr style='line-height: 1.0;'>"
-					+ "<th style='min-width: 6em'>" + "FOR&nbsp;3:&nbsp;</th>"
-					+ "<td style='min-width: 20em'>" + forTranslation[for3] + "&nbsp;(" + for3 + ")</td>"
-					+ "<td style='max-width: 4em'>" + projectSummary.for_percentage_3 + "&nbsp;%&nbsp;</td>"
-					+ "</tr>";
+					forDistributionTable += "<div>"
+					+ "<span style='min-width: 20em'>" + forTranslation[for3] + "&nbsp;(" + for3 + ")&nbsp;</span>"
+					+ "<span style='max-width: 4em'>" + projectSummary.for_percentage_3 + "&nbsp;%&nbsp;</span>"
+					+ "</div>";
 				}
-				forDistributionTable += "</table>";
 				return forDistributionTable;
 			}
 			return projectSummary[row]; 
@@ -104,10 +100,7 @@ function graphQuota(pageAreaSelector, quotaKey, usage) {
 				.domain("0", "1")
 			    .range(["#006ccf", "#f2f2f2"]);
 
-	var pie = d3.layout.pie()
-				.value(function(d) { 
-						return d; 
-				});
+	var pie = d3.layout.pie();
 
 	var arc = d3.svg.arc()
 				.outerRadius(PIE_CHART_RADIUS)
@@ -131,18 +124,6 @@ function graphQuota(pageAreaSelector, quotaKey, usage) {
 				.style("fill", function(d, i) { 
 					return color(i); 
 				});
-
-	g.append("text")
-				.attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
-				.attr("dy", ".35em")
-				.style("text-anchor", "middle")
-				.style("font-weight", "bold")
-				.style("font-family", "'Helvetica Neue', Helvetica, Arial, sans-serif")
-				.style("font-size", "13px")
-				.text(function(d) { 
-					var usageQuota = (usage[0] + usage[1]) + "";
-					return d.data == "0" ? "" : d.data + "/" + usageQuota; 
-				});
 }
 
 //==== Project Allocation: Assembling the Pieces.
@@ -152,10 +133,14 @@ function projectDetails() {
 	d3.json("/nacc/rest/for_codes", function(error, forTranslation) {
 		d3.json("/nacc/rest/allocations/" + allocationId + "/project/summary", function(error, projectSummary) {
 			tabulateSummary("#project-summary", projectSummary, forTranslation);
+			
 			var coreUsage = [projectSummary.cores, projectSummary.core_quota - projectSummary.cores];
 			graphQuota("#core-pie-chart","cores", coreUsage);
+			$("#core-label").html("Used&nbsp;" + projectSummary.cores + "&nbsp;of&nbsp;" + projectSummary.core_quota);
+			
 			instanceUsage = [projectSummary.instances, projectSummary.instance_quota - projectSummary.instances];
 			graphQuota("#instance-pie-chart","instances", instanceUsage);
+			$("#instance-label").html("Used&nbsp;" + projectSummary.instances + "&nbsp;of&nbsp;" + projectSummary.instance_quota);
 		});
 	});
 }
