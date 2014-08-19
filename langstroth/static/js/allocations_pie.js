@@ -44,7 +44,7 @@ function nextLevel(forCodes, children) {
 // Restructure allocation tree into a single level array of objects.
 // The tree is flattened by taking the sum of all allocations on the branch.
 function restructureAllocations(allocationTree, isCoreQuota) {
-	//var colourIndex = 0;
+	var colourIndex = 0;
     var dataset = [];
     var allocationCount = allocationTree.length;
     for (var allocationIndex = 0; allocationIndex < allocationCount; allocationIndex++) {
@@ -72,13 +72,10 @@ function restructureAllocations(allocationTree, isCoreQuota) {
     	//allocationItem.colourIndex = colourIndex++;   // Color palette index
     	dataset.push(allocationItem);
     }
-    var metaSum = 0.0;
+	dataset.sort(function(a, b){return b.value - a.value; });
     var recordCount = dataset.length;
     for (var recordIndex = 0; recordIndex < recordCount; recordIndex++) {
-    	metaSum += dataset[recordIndex].value;
-    }
-    for (recordIndex = 0; recordIndex < recordCount; recordIndex++) {
-    	dataset[recordIndex].colourIndex = (dataset[recordIndex].value / metaSum) * recordCount;
+    	dataset[recordIndex].colourIndex = colourIndex++;
     }
     return dataset;
 }
@@ -253,7 +250,7 @@ var totalText = statisticsArea.append("text")
 			var currentPalette = paletteStack.tos();
 			var currentColour = currentPalette(data.colourIndex);
 			var newPalette = d3.scale.linear()
-								.domain([-5, dataset.length])
+								.domain([-20, dataset.length])
 								.range(["white", currentColour]);
 			paletteStack.push(newPalette);
 			visualise(dataset, totalResource);

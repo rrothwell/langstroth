@@ -77,3 +77,7 @@ text {
 .click-message {
   cursor: pointer;
 }
+
+.row-click {
+  cursor: pointer; cursor: hand;
+}

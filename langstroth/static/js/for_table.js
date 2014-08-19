@@ -84,17 +84,12 @@ function buildTable(pageAreaSelector, isCoreQuota) {
 		.attr("class", "col3")
 		.style("min-width", "20px")
 		.text(isCoreQuota ? "Cores" : "Instances");
-	headerRow.append("th")
-		.attr("class", "col4")
-		.text("Zoom");
 	
 	return table;
 }
 
 function tabulateAllocations(table, dataset, total, isCoreQuota) {
 	
-	dataset.sort(function(a, b){return b.value - a.value; });
-
 	// Adjust the header
 	
 	var caption = table.select("caption")
@@ -166,14 +161,14 @@ function tabulateAllocations(table, dataset, total, isCoreQuota) {
 				}
 				return roundedValue; 
 			});		
-	
-	rows.select("td.col4");		
 
 	// Add new data records
 
 	var newRows = rows.enter()
 		.append("tr")
 		.attr('data-row',function(d,i){return i; })
+		.attr('class', "row-click")
+		.on("click", zoomInTable)
 		.on("mouseover", inflateChartSegment)
 		.on("mousemove", moveRelatedLabels)
 		.on("mouseout", deflateChartSegment);
@@ -225,13 +220,6 @@ function tabulateAllocations(table, dataset, total, isCoreQuota) {
 				}
 				return roundedValue; 
 			});		
-
-	newRows.append("td")
-		.attr("class", "col4")
-		.style("text-align", "center")
-		.style("cursor", "pointer")
-		.on("click", zoomInTable)
-		.html("<span class='glyphicon glyphicon-zoom-in'></span>");		
 
 	// Remove old records.
 	
