@@ -47,7 +47,9 @@ function tabulateSummary(pageAreaSelector, projectSummary, forTranslation) {
 					.append("tr");
 	
 	rows.append("th")
-		.style("max-width", "60px")
+		.style("max-width", "170px")
+		.style("min-width", "130px")
+		.style("width", "130px")
 		.text(function(row) { 
 				return headings[row]; 
 			});
