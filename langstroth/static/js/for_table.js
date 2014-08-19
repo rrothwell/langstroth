@@ -44,13 +44,10 @@ function deflateChartSegment(d) {
 		.attr("transform", "translate(0, 0)");
 }
 
-
 function zoomInTable(d) {
 	deflateChartSegment(d);
 	zoomIn(d);
  }
-
-
 
 function buildTable(pageAreaSelector, isCoreQuota) {
 	// Define the table with heading.

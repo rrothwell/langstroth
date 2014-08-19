@@ -102,8 +102,14 @@ class AllocationRequest(models.Model):
     
     @staticmethod
     def find_active_allocations():
-        return AllocationRequest.objects.filter(Q(status ='A') | Q(status ='X')).annotate(last_allocation=Max('modified_time'))      
-        #return AllocationRequest.objects.filter(Q(status ='A') | Q(status ='X'))
+        all_approved_allocations = AllocationRequest.objects.filter(Q(status ='A') | Q(status ='X')).order_by('-modified_time')
+        seen = set()
+        keep = []
+        for allocation in all_approved_allocations:
+            if allocation.project_name not in seen:
+                keep.append(allocation)
+                seen.add(allocation.project_name)
+        return keep      
     
     @staticmethod
     def is_valid_for_code(potential_for_code):
