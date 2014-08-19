@@ -33,6 +33,13 @@ function inflateChartSegment(d, i) {
 		    var deltaY = 5 * Math.sin(bisectorAngle);
 			return "translate(" + deltaX + "," + deltaY + ")";
 		});
+		
+		if (isForCodeLevel()) {
+			// Do nothing
+		} else {
+			showProjectSummary(d);
+			toolTip.style("visibility", "visible");
+		}
 }
 
 function deflateChartSegment(d) { 
@@ -42,6 +49,8 @@ function deflateChartSegment(d) {
 	segment.style("stroke", UNHILITE_SEGMENT_COLOUR)
 		.style("stroke-width", UNHILITE_SEGMENT_WIDTH)
 		.attr("transform", "translate(0, 0)");
+	
+	toolTip.style("visibility", "hidden");
 }
 
 function zoomInTable(d) {
@@ -166,6 +175,7 @@ function tabulateAllocations(table, dataset, total, isCoreQuota) {
 		.append("tr")
 		.attr('data-row',function(d,i){return i; })
 		.on("mouseover", inflateChartSegment)
+		.on("mousemove", moveRelatedLabels)
 		.on("mouseout", deflateChartSegment);
 
 	newRows.append("td")

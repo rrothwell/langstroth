@@ -307,27 +307,6 @@ var totalText = statisticsArea.append("text")
 		return isCramped(d) ? 1.0 : 0.0 ; 
 	}
 
-	function showRelatedLabels2(d, i) { 
-	    this.style.stroke = HILITE_SEGMENT_COLOUR;
-	    this.style["stroke-width"] = HILITE_SEGMENT_WIDTH;
-	    var bisectorAngle = (d.endAngle + d.startAngle) / 2.0 + -Math.PI / 2;
-	    var deltaX = 5 * Math.cos(bisectorAngle);
-	    var deltaY = 5 * Math.sin(bisectorAngle);
-	    d3.select(this).attr("transform", "translate(" + deltaX + "," + deltaY + ")");
-		table.selectAll("td.col0").each(function(row) { 
-				if (row.colourIndex == d.data.colourIndex) {
-					$(this).siblings().css('background-color', HILITE_SEGMENT_COLOUR);
-					$(this).siblings().css('color', HILITE_TEXT_COLOUR);
-				}; 
-			});
-//		if (isForCodeLevel()) {
-//			showFORDescription(d);
-//		} else {
-//			showProjectSummary(d);
-//		}
-//		toolTip.style("visibility", "visible");
-	}
-
 	function showRelatedLabels(d, i) { 
 		var segment = null;
 		if (this.nodeName == "text") {
@@ -349,12 +328,12 @@ var totalText = statisticsArea.append("text")
 					otherColumns.css('color', HILITE_TEXT_COLOUR);
 				}; 
 			});
-//		if (isForCodeLevel()) {
-//			showFORDescription(d);
-//		} else {
-//			showProjectSummary(d);
-//		}
-//		toolTip.style("visibility", "visible");
+		if (isForCodeLevel()) {
+			showFORDescription(d);
+		} else {
+			showProjectSummary(d.data);
+		}
+		toolTip.style("visibility", "visible");
 	}
 
 	function moveRelatedLabels(d, i) { 
@@ -389,22 +368,22 @@ var totalText = statisticsArea.append("text")
 
 	//---- Popup showing project summary.
 		  	
-	function showProjectSummary(d) {
+	function showProjectSummary(data) {
 	 	var markup = "<div class='details-container centred-container'>" 
- 			+ "<table class='table-striped table-bordered table-condensed'>" 
+ 			+ "<table class='table-striped table-condensed'>" 
  			+ "<tr>"
  			+ "<th>"
  			+ "Project: " 
  			+ "</th>"
  			+ "<td>"
- 			+ d.data.projectName.makeWrappable()
+ 			+ data.projectName.makeWrappable()
  			+ "</td>"
  			+ "</tr>"
  			+ "<th>"
  			+ "Institution: " 
  			+ "</th>"
  			+ "<td>"
- 			+ d.data.institutionName
+ 			+ data.institutionName
  			+ "</td>"
  			+ "</tr>"
  			+ "<tr>"
@@ -412,7 +391,7 @@ var totalText = statisticsArea.append("text")
  			+ "Core quota: " 
  			+ "</th>"
  			+ "<td>"
- 			+ d.data.coreQuota
+ 			+ data.coreQuota
  			+ "</td>"
  			+ "</tr>"
  			+ "<tr>"
@@ -420,7 +399,7 @@ var totalText = statisticsArea.append("text")
  			+ "Instance quota: " 
  			+ "</th>"
  			+ "<td>"
- 			+ d.data.instanceQuota
+ 			+ data.instanceQuota
  			+ "</td>"
  			+ "</tr>"
  			+ "<tr>"
@@ -428,7 +407,7 @@ var totalText = statisticsArea.append("text")
  			+ "Use case: " 
  			+ "</th>"
  			+ "<td>"
- 			+ d.data.useCase 
+ 			+ data.useCase 
  			+ "</td>"
  			+ "</tr>"
  			+ "</table>"
@@ -442,10 +421,10 @@ var totalText = statisticsArea.append("text")
 		var forCode = d.data.target;
   		var forName = forTitleMap[forCode].toLowerCase();
 	 	var markup = "<div class='details-container centred-container'>" 
- 			+ "<table class='table-striped table-bordered table-condensed'>" 
+ 			+ "<table class='table-condensed'>" 
  			+ "<tr>"
  			+ "<th>"
- 			+ "FOR: " 
+ 			+ forCode + ":&nbsp;"
  			+ "</th>"
  			+ "<td style='text-transform: capitalize;'>"
  			+  forName     		
