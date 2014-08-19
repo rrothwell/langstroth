@@ -153,7 +153,7 @@ function tabulateAllocations(table, dataset, total, isCoreQuota) {
 	rows.select("td.col2")
 		.text(function(row) { 
 				var percent = row["value"] * 100.00 / total;
-				return percent.toFixed(2); 
+				return percent.toFixed(0); 
 			});
 	
 	rows.select("td.col3")
@@ -209,7 +209,7 @@ function tabulateAllocations(table, dataset, total, isCoreQuota) {
 		.style("text-align", "right")
 		.text(function(row) { 
 				var percent = row["value"] * 100.00 / total;
-				return percent.toFixed(2); 
+				return percent.toFixed(0); 
 			});
 
 	newRows.append("td")
