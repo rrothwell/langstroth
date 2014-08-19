@@ -256,9 +256,15 @@ var totalText = statisticsArea.append("text")
 		}
 	 }
 	
-	function zoomInPie(p) {
+	function zoomInPie(p, i) {
 		var data = p.data;
-		_hideRelatedLabels(this, data);
+		var segment = null;
+		if (this.nodeName == "text") {
+			segment = d3.select("#segment-" + i);
+		} else {
+			segment = d3.select(this);
+		}
+		_hideRelatedLabels(segment, data);
 		zoomIn(data);
 	 }
 
@@ -293,7 +299,7 @@ var totalText = statisticsArea.append("text")
 		return isCramped(d) ? 1.0 : 0.0 ; 
 	}
 
-	function showRelatedLabels(d, i) { 
+	function showRelatedLabels2(d, i) { 
 	    this.style.stroke = HILITE_SEGMENT_COLOUR;
 	    this.style["stroke-width"] = HILITE_SEGMENT_WIDTH;
 	    var bisectorAngle = (d.endAngle + d.startAngle) / 2.0 + -Math.PI / 2;
@@ -314,16 +320,45 @@ var totalText = statisticsArea.append("text")
 //		toolTip.style("visibility", "visible");
 	}
 
+	function showRelatedLabels(d, i) { 
+		var segment = null;
+		if (this.nodeName == "text") {
+			segment = d3.select("#segment-" + i);
+		} else {
+			segment = d3.select(this);
+		}
+		segment
+			.style("stroke", HILITE_SEGMENT_COLOUR)
+			.style("stroke-width", HILITE_SEGMENT_WIDTH);			
+	    var bisectorAngle = (d.endAngle + d.startAngle) / 2.0 + -Math.PI / 2;
+	    var deltaX = 5 * Math.cos(bisectorAngle);
+	    var deltaY = 5 * Math.sin(bisectorAngle);
+	    segment.attr("transform", "translate(" + deltaX + "," + deltaY + ")");
+		table.selectAll("td.col0").each(function(row) { 
+				if (row.colourIndex == d.data.colourIndex) {
+					$(this).siblings().css('background-color', HILITE_SEGMENT_COLOUR);
+					$(this).siblings().css('color', HILITE_TEXT_COLOUR);
+				}; 
+			});
+//		if (isForCodeLevel()) {
+//			showFORDescription(d);
+//		} else {
+//			showProjectSummary(d);
+//		}
+//		toolTip.style("visibility", "visible");
+	}
+
 	function moveRelatedLabels(d, i) { 
 		var top = (d3.event.pageY - 10) + "px";
 		var left = (d3.event.pageX + 10) + "px";
 		toolTip.style("top", top).style("left", left);
 	}
 
-	function _hideRelatedLabels(self, data) {
-		self.style.stroke = UNHILITE_SEGMENT_COLOUR;
-		self.style["stroke-width"] = UNHILITE_SEGMENT_WIDTH;
-	    d3.select(self).attr("transform", "translate(0, 0)");
+	function _hideRelatedLabels(segment, data) {
+		segment
+			.style("stroke", UNHILITE_SEGMENT_COLOUR)
+			.style("stroke-width", UNHILITE_SEGMENT_WIDTH)		
+			.attr("transform", "translate(0, 0)");
 		table.selectAll("td.col0").each(function(row) { 
 			if (row.colourIndex == data.colourIndex) {
 				$(this).siblings().css('background-color', UNHILITE_CELL_COLOUR);
@@ -333,8 +368,14 @@ var totalText = statisticsArea.append("text")
 		toolTip.style("visibility", "hidden");
 	}
 
-	function hideRelatedLabels(d) {
-		_hideRelatedLabels(this, d.data);
+	function hideRelatedLabels(d, i) {
+		var segment = null;
+		if (this.nodeName == "text") {
+			segment = d3.select("#segment-" + i);
+		} else {
+			segment = d3.select(this);
+		}
+		_hideRelatedLabels(segment, d.data);
 	}
 
 	//---- Popup showing project summary.
@@ -426,6 +467,39 @@ function visualise( dataset, totalResource ) {
       .duration(DURATION)
       .attrTween("d", arcTween);
 
+    // Display new data items:
+    
+    // -- slices first.
+    
+    var newSlices = slices.enter()
+          .append('g')
+          .attr('class', 'slice');
+
+    newSlices.append("path")
+      .attr("class", 'plot-slice')
+      .attr("id", function(d, i) { return 'segment-' + i; })
+      .attr("fill", function (d, i) {
+        return paletteStack.tos()(d.data.colourIndex);
+      })
+      .style('stroke', UNHILITE_SEGMENT_COLOUR)
+      .style('stroke-width', UNHILITE_SEGMENT_WIDTH)
+      .attr('d', arc(enterClockwise))
+      .each(function (d) {
+        this._current = {
+          data: d.data,
+          value: d.value,
+          startAngle: enterAntiClockwise.startAngle,
+          endAngle: enterAntiClockwise.endAngle
+        };        
+      })
+      .on("click", zoomInPie)
+       .on("mouseover", showRelatedLabels)
+       .on("mousemove", moveRelatedLabels)
+       .on("mouseout", hideRelatedLabels)
+      .transition()
+      .duration(DURATION)
+      .attrTween("d", arcTween)
+		;
 	// Begin text annotation.
     slices.selectAll('text').remove();
 
@@ -453,43 +527,12 @@ function visualise( dataset, totalResource ) {
       })
       .style("opacity", 0)
        .on("click", zoomInPie)
-      .transition()
-      .duration(DURATION_FAST)
-      .style("opacity", calculateOpacity0);
-
-
-    // Display new data items:
-    
-    // -- slices first.
-    
-    var newSlices = slices.enter()
-          .append('g')
-          .attr('class', 'slice');
-
-    newSlices.append("path")
-      .attr("class", 'plot-slice')
-      .attr("fill", function (d, i) {
-        return paletteStack.tos()(d.data.colourIndex);
-      })
-      .style('stroke', UNHILITE_SEGMENT_COLOUR)
-      .style('stroke-width', UNHILITE_SEGMENT_WIDTH)
-      .attr('d', arc(enterClockwise))
-      .each(function (d) {
-        this._current = {
-          data: d.data,
-          value: d.value,
-          startAngle: enterAntiClockwise.startAngle,
-          endAngle: enterAntiClockwise.endAngle
-        };        
-      })
-      .on("click", zoomInPie)
        .on("mouseover", showRelatedLabels)
        .on("mousemove", moveRelatedLabels)
        .on("mouseout", hideRelatedLabels)
       .transition()
-      .duration(DURATION)
-      .attrTween("d", arcTween)
-		;
+      .duration(DURATION_FAST)
+      .style("opacity", calculateOpacity0);
 
     // -- Text annotations third, virtual CPU count for corresponding domain.
     newSlices
@@ -517,6 +560,9 @@ function visualise( dataset, totalResource ) {
       })
       .style("opacity", 0)
        .on("click", zoomInPie)
+       .on("mouseover", showRelatedLabels)
+       .on("mousemove", moveRelatedLabels)
+       .on("mouseout", hideRelatedLabels)
       .transition()
       .duration(DURATION_FAST)
       .style("opacity", calculateOpacity0)
