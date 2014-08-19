@@ -42,3 +42,4 @@ Thumbs.db
 lxml.output
 private_data/*
 langstroth/nectar_allocations/fixtures/allocation_requests.json
+langstroth/nectar_allocations/fixtures/nectar_allocations_dump_all.json
