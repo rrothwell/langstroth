@@ -1,4 +1,5 @@
 import logging
+import json
 import calendar
 
 import requests
@@ -7,7 +8,7 @@ import lxml.etree
 from django.conf import settings
 
 
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger('custom.debug')
 
 AVAILABILITY_QUERY_TEMPLATE = "avail.cgi?t1=%s&t2=%s&show_log_entries=&servicegroup=%s&assumeinitialstates=yes&assumestateretention=yes&assumestatesduringnotrunning=yes&includesoftstates=yes&initialassumedhoststate=3&initialassumedservicestate=6&timeperiod=[+Current+time+range+]&backtrack=4"
 STATUS_QUERY_TEMPLATE = "status.cgi?servicegroup=%s&style=detail"
@@ -130,7 +131,9 @@ def get_availability(start_date, end_date):
         url = settings.NAGIOS_URL + query
     else:
         url = settings.NAGIOS_AVAILABILITY_URL
+    LOG.debug("Availability URL: " + url)
     resp = requests.get(url, auth=settings.NAGIOS_AUTH)
+    LOG.debug("Availability response: " + resp.text)
     return parse_availability(resp.text)
 
 

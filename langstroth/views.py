@@ -12,9 +12,13 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.shortcuts import render
 from django.core.cache import cache
+import logging
+import json
 
 
 from langstroth import nagios
+
+LOG = logging.getLogger('custom.debug')
 
 GRAPHITE = settings.GRAPHITE_URL + "/render/"
 
@@ -39,15 +43,21 @@ def index(request):
     except:
         availability = cache.get('nagios_availability')
 
+    LOG.debug("Availability: " + json.dumps(availability))
+
     try:
         status = nagios.get_status()
         cache.set('nagios_status', status)
     except:
         status = cache.get('nagios_status')
 
+    LOG.debug("Status: " + json.dumps(status))
+
     context = {"title": "National Endpoint Status",
                "tagline": "",
                "report_range": "%s to Now" % then.strftime('%d, %b %Y')}
+    
+    
     context['average'] = availability['average']
     for host in status['hosts'].values():
         for service in host['services']:
