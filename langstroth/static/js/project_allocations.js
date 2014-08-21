@@ -18,7 +18,7 @@ var headings = {
 function projectDetails(elementId) {
 	d3.json("/nacc/rest/allocations/" + allocationId + "/project/allocations", function(error, allocations) {
 		var allocation = null;
-		var allocationCount = allocations.length
+		var allocationCount = allocations.length;
 		for (var allocationIndex = 0; allocationIndex < allocationCount; allocationIndex++) {			
 			allocation = allocations[allocationIndex];
 			
@@ -30,7 +30,7 @@ function projectDetails(elementId) {
 //			var caption = table.append("caption")
 //							.text("Allocation: " + allocationIndex); 
 			var thead = table.append("thead"); // Not used.			
-			var tbody = table.append("tbody")
+			var tbody = table.append("tbody");
 			
 			var rows = tbody.selectAll("tr")
 				.data(function(row) { 

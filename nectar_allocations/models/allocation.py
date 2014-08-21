@@ -1,7 +1,6 @@
 from django.db import models
 from django.conf import settings
 from django.db.models import Q
-from django.db.models import Max
 
 from nectar_allocations.switch import Switch
 
@@ -100,6 +99,10 @@ class AllocationRequest(models.Model):
         name, delimiter, domain = email_address.partition('@')       
         return domain
     
+    # Find the list of allocations that have been approved, 
+    # group them by name,
+    # but then return just the latest in each allocation group.
+    # The data needs some cleanup as there are some allocations with very similar names.
     @staticmethod
     def find_active_allocations():
         all_approved_allocations = AllocationRequest.objects.filter(Q(status ='A') | Q(status ='X')).order_by('-modified_time')

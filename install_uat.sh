@@ -26,6 +26,8 @@ sudo mv ~/langstroth /usr/local/django
 # Keep Apache2 and langstroth.conf happy.
 # 1. Logging destination
 sudo mkdir -p /usr/local/django/langstroth/apache/logs
+sudo chmod ugo+w /usr/local/django/langstroth/apache/logs
+
 
 # 2. Create the static content location.
 sudo mkdir -p /usr/local/django/langstroth/static
@@ -40,4 +42,4 @@ sudo cp -R /usr/local/django/langstroth/langstroth/data/* /usr/local/django/lang
 #sudo vi allocations_pie.js
 
 #Set as UAT environment
-sed -i 's/CURRENT_ENVIRONMENT = DEV_ENVIRONMENT/CURRENT_ENVIRONMENT = UAT_ENVIRONMENT/' /usr/local/django/langstroth/langstroth/settings.py
+sudo sed -i 's/CURRENT_ENVIRONMENT = DEV_ENVIRONMENT/CURRENT_ENVIRONMENT = UAT_ENVIRONMENT/' /usr/local/django/langstroth/langstroth/settings.py

@@ -484,6 +484,8 @@ function visualise( dataset, totalResource ) {
       .duration(DURATION)
       .attrTween("d", arcTween)
 		;
+    
+    
 	// Begin text annotation.
     slices.selectAll('text').remove();
 
@@ -519,6 +521,7 @@ function visualise( dataset, totalResource ) {
       .style("opacity", calculateOpacity0);
 
     // -- Text annotations third, virtual CPU count for corresponding domain.
+    
     newSlices
     	.append("text")
       .attr("id", function(d, i) { return 'value-plot-label-' + i; })

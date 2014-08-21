@@ -129,7 +129,7 @@ function graphQuota(pageAreaSelector, quotaKey, usage) {
 }
 
 //==== Project Allocation: Assembling the Pieces.
-// Table and 3 pie charts.
+// Table and 2 pie charts.
 
 function projectDetails() {
 	d3.json("/nacc/rest/for_codes", function(error, forTranslation) {
