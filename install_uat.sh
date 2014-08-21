@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Install the Langstroth web application on the demo server.
+# Install the Langstroth web application on the demo/user acceptance testing (UAT)  server.
 # The demo server publishes Langstroth using Apache2 and the WSGI module.
 
 # Configure the langstroth.conf file to publish static content.
@@ -18,7 +18,7 @@ if [ ! -d "$LANGSTROTH_DISTRIBUTION" ]; then
 	git archive --format=tar --prefix=langstroth/ --remote=git@code.vpac.org:ncr002-dataanalysis/ncr002-langstroth.git  master | tar -xf -
 fi
 
-# Backup the previous web app.
+# Backup the previous version of the web app.
 TODAY=`date +"%Y%m%d-%T"`
 sudo mv /usr/local/django/langstroth /usr/local/django/langstroth-$TODAY
 sudo mv ~/langstroth /usr/local/django
