@@ -28,6 +28,8 @@ sudo mv ~/langstroth /usr/local/django
 sudo mkdir -p /usr/local/django/langstroth/apache/logs
 sudo chmod ugo+w /usr/local/django/langstroth/apache/logs
 
+sudo mkdir -p /usr/local/django/langstroth/logs
+sudo chmod ugo+w /usr/local/django/langstroth/logs
 
 # 2. Create the static content location.
 sudo mkdir -p /usr/local/django/langstroth/static
