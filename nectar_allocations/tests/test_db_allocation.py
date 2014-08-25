@@ -129,8 +129,9 @@ class AllocationDBTest(TestCase):
         self.assertEquals('UoM_Trajectory_Inference_Attacks', project_allocations[0]['project_name'])
         self.assertEquals('2014-01-06', project_allocations[0]['start_date'])
         self.assertEquals('2014-01-31', project_allocations[0]['end_date'])
-        expected_usecase = "In this project, an algorithm has been developed to infer a persons road trajectory using POI information sent to a LBS such as Google Maps.\r\n\r\n" 
-        self.assertEquals(expected_usecase, project_allocations[0]['use_case'])
+        #expected_usecase = "In this project, an algorithm has been developed to infer a persons road trajectory using POI information sent to a LBS such as Google Maps.\r\n\r\n" 
+        #self.assertEquals(expected_usecase, project_allocations[0]['use_case'])
+        self.assertFalse('use_case' in project_allocations[0])
         self.assertEquals('Data is stored on a remote server so no storage is needed.', project_allocations[0]['usage_patterns'])
         
     def test_project_allocations_from_allocation_request_id_with_multi_requests(self):       
@@ -141,15 +142,17 @@ class AllocationDBTest(TestCase):
         self.assertEquals('USQ eResearch Services Sandbox', project_allocations[0]['project_name'])
         self.assertEquals('2014-02-17', project_allocations[0]['start_date'])
         self.assertEquals('2014-05-17', project_allocations[0]['end_date'])
-        expected_usecase = "The cloud instances will be used to set up quick demos for researchers at USQ to run test experiments, simulations, modelling and calculations.\r\n\r\n" 
-        self.assertEquals(expected_usecase, project_allocations[0]['use_case'])
+        #expected_usecase = "The cloud instances will be used to set up quick demos for researchers at USQ to run test experiments, simulations, modelling and calculations.\r\n\r\n" 
+        #self.assertEquals(expected_usecase, project_allocations[0]['use_case'])
+        self.assertFalse('use_case' in project_allocations[0])
         self.assertEquals('Many users and small data sets as well as small number of users and large data sets. This will vary depending on the tests and the resesearch group.', project_allocations[0]['usage_patterns'])
 
         self.assertEquals('USQ eResearch Services Sandbox', project_allocations[1]['project_name'])
         self.assertEquals('2014-02-17', project_allocations[1]['start_date'])
         self.assertEquals('2014-05-17', project_allocations[1]['end_date'])
-        expected_usecase = "The cloud instances will be used to set up quick demos for researchers at USQ to run test experiments, simulations, modelling and calculations.\r\n\r\n" 
-        self.assertEquals(expected_usecase, project_allocations[1]['use_case'])
+        #expected_usecase = "The cloud instances will be used to set up quick demos for researchers at USQ to run test experiments, simulations, modelling and calculations.\r\n\r\n" 
+        #self.assertEquals(expected_usecase, project_allocations[1]['use_case'])
+        self.assertFalse('use_case' in project_allocations[1])
         self.assertEquals('Many users and small data sets as well as small number of users and large data sets. This will vary depending on the tests and the resesearch group.', project_allocations[0]['usage_patterns'])
         
     def test_projects_from_allocation_request_id(self):       
@@ -159,8 +162,9 @@ class AllocationDBTest(TestCase):
         self.assertEquals('UoM_Trajectory_Inference_Attacks', project_summary['project_name'])
         self.assertEquals('2014-01-06', project_summary['start_date'])
         self.assertEquals('2014-01-31', project_summary['end_date'])
-        expected_usecase = "In this project, an algorithm has been developed to infer a persons road trajectory using POI information sent to a LBS such as Google Maps.\r\n\r\n" 
-        self.assertEquals(expected_usecase, project_summary['use_case'])
+        #expected_usecase = "In this project, an algorithm has been developed to infer a persons road trajectory using POI information sent to a LBS such as Google Maps.\r\n\r\n" 
+        #self.assertEquals(expected_usecase, project_summary['use_case'])
+        self.assertFalse('use_case' in project_summary)
         self.assertEquals('Data is stored on a remote server so no storage is needed.', project_summary['usage_patterns'])
         self.assertEquals(30, project_summary['instance_quota'])
         self.assertEquals(30, project_summary['core_quota'])
@@ -182,8 +186,9 @@ class AllocationDBTest(TestCase):
         self.assertEquals('USQ eResearch Services Sandbox', project_summary['project_name'])
         self.assertEquals('2014-02-17', project_summary['start_date'])
         self.assertEquals('2014-05-17', project_summary['end_date'])
-        expected_usecase = "The cloud instances will be used to set up quick demos for researchers at USQ to run test experiments, simulations, modelling and calculations.\r\n\r\n" 
-        self.assertEquals(expected_usecase, project_summary['use_case'])
+        #expected_usecase = "The cloud instances will be used to set up quick demos for researchers at USQ to run test experiments, simulations, modelling and calculations.\r\n\r\n" 
+        #self.assertEquals(expected_usecase, project_summary['use_case'])
+        self.assertFalse('use_case' in project_summary)
         self.assertEquals('Many users and small data sets as well as small number of users and large data sets. This will vary depending on the tests and the resesearch group.', project_summary['usage_patterns'])
         self.assertEquals(2, project_summary['instance_quota'])
         self.assertEquals(4, project_summary['core_quota'])

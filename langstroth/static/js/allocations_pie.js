@@ -63,7 +63,8 @@ function restructureAllocations(allocationTree, isCoreQuota) {
 			allocationItem.institutionName = child.institution;
 			allocationItem.coreQuota = child.coreQuota;
 			allocationItem.instanceQuota = child.instanceQuota;
-			allocationItem.useCase = child.useCase.abbreviate(128);			
+			//allocationItem.useCase = child.useCase.abbreviate(128);			
+			allocationItem.useCase = "Redacted";			
 			allocationItem.usagePattern = child.usagePattern;			
 			sum = isCoreQuota ? child.coreQuota : child.instanceQuota;
     	}
