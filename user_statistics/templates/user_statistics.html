@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block extra_head %}
+      <link href='{{ STATIC_URL }}css/user_statistics.css' type='text/css' media='screen' rel='stylesheet'/>
+{% endblock %}
+
+{% block content %}
+		<div class="row">
+			<div  class="col-md-6">
+				<div  id="inner-plot-container" >
+					<div id="plot-area" class="plot-alignment"></div>
+				</div>
+			</div>
+		</div>
+{% endblock %}
+	
+{% block extra_script %}
+	<script src="{{ STATIC_URL }}js/d3.v3.js"></script>
+	<script src="{{ STATIC_URL }}js/user_statistics.js"></script>
+{% endblock %}
+	
+	
