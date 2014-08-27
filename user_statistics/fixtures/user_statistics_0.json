@@ -1,0 +1,10 @@
+[
+	{
+		"pk": "1234",
+		"model": "user_statistics.registration"
+		"fields": {
+			"user_name": "Joe Bloggs",
+			"creation_date": "2014-02-16T23:21:59Z",
+		}
+	},
+]
