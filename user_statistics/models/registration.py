@@ -3,7 +3,7 @@ from django.conf import settings
 
 class UserRegistration(models.Model):
 
-    user_name = models.CharField(max_length=200, db_column="user_name", null=False)
+    user_name = models.CharField(max_length=80, db_column="user_name", null=False)
     creation_time = models.DateTimeField(db_column="creation_time", null=False)
     
     def __unicode__(self):
@@ -12,14 +12,28 @@ class UserRegistration(models.Model):
     class Meta:
         ordering = ["user_name"]
         app_label = 'user_statistics'
-        db_table = 'user_statistics_UserRegistration'
+        db_table = 'user_statistics_registration'
         managed = False if not settings.TEST_MODE else True
     
-    # Find the list of allocations that have been approved, 
-    # group them by name,
-    # but then return just the latest in each allocation group.
-    # The data needs some cleanup as there are some allocations with very similar names.
     @staticmethod
     def history():
-        return UserRegistration.objects.all()      
-    
+        history = UserRegistration.objects.all()
+        history_items = []
+        for record in history:
+            item = {}
+            item['user_name'] = record.user_name
+            item['creation_time'] = record.creation_time.strftime('%Y-%m-%d %H:%M:%S')
+            history_items.append(item)
+        return history_items
+             
+  
+    @staticmethod
+    def user_dict():
+        pairs = UserRegistration.objects.all()
+        code_map = {}
+        for pair in pairs:
+            key = pair.user_name
+            value = pair.creation_time.strftime('%Y-%m-%d %H:%M:%S')
+            code_map[key] = value
+        return code_map
+  
