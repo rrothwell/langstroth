@@ -20,4 +20,9 @@ def registrations_history(request):
     registration_history = UserRegistration.history()
     json_string = dumps(registration_history)
     return HttpResponse(json_string, "application/json")
+
+def registrations_frequency(request):
+    registration_frequency = UserRegistration.frequency()
+    json_string = dumps(registration_frequency)
+    return HttpResponse(json_string, "application/json")
    
