@@ -28,4 +28,20 @@ class UserRegistrationDBTest(TestCase):
         actual_list = UserRegistration.history()
         self.assertEqual(2, len(actual_list))
         self.assertEqual(expected_list, actual_list)
+               
+    def test_frequency_2_items_in_2_separate_bins(self):
+        expected_list = [{'date':'2014-02-16', 'count': 1}, 
+        {'date':'2014-03-16', 'count': 1}]
+        actual_list = UserRegistration.frequency()
+        self.assertEqual(2, len(actual_list))
+        self.assertEqual(expected_list, actual_list)
+               
+    def test_frequency_4_items_in_2_separate_bins(self):
+        UserRegistration.objects.create(user_name="aaaa", creation_time="2014-02-16T05:07:00Z")
+        UserRegistration.objects.create(user_name="4bbbb", creation_time="2014-03-16T00:59:45Z")
+        expected_list = [{'date':'2014-02-16', 'count': 2}, 
+        {'date':'2014-03-16', 'count': 2}]
+        actual_list = UserRegistration.frequency()
+        self.assertEqual(2, len(actual_list))
+        self.assertEqual(expected_list, actual_list)
 

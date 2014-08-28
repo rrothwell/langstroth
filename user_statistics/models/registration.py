@@ -10,7 +10,7 @@ class UserRegistration(models.Model):
         return self.user_name + '(' + self.id + ')'
     
     class Meta:
-        ordering = ["user_name"]
+        ordering = ["creation_time"]
         app_label = 'user_statistics'
         db_table = 'user_statistics_registration'
         managed = False if not settings.TEST_MODE else True
@@ -25,6 +25,26 @@ class UserRegistration(models.Model):
             item['creation_time'] = record.creation_time.strftime('%Y-%m-%d %H:%M:%S')
             history_items.append(item)
         return history_items
+    
+    @staticmethod
+    def frequency():
+        history = UserRegistration.objects.all()
+        known_dates = dict()
+        for record in history:
+            date = record.creation_time.date()
+            if not date in known_dates:
+                known_dates[date] = 0
+            known_dates[date] += 1
+        frequency_items = []
+        for date in known_dates:
+            item = {'date': date, 'count': known_dates[date]}
+            frequency_items.append(item)
+        # Dictionary values so longer sorted by date so sort by date.
+        frequency_items = sorted(frequency_items, key=lambda item: item['date']) 
+        # Convert all dates to string dates.
+        for item in frequency_items:
+            item['date'] = item['date'].strftime('%Y-%m-%d')
+        return frequency_items
              
   
     @staticmethod
