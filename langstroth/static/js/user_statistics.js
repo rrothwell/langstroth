@@ -1,4 +1,6 @@
 ////// Area Plot of NeCTAR User Registration History
+var registrationFrequency = [];
+var isCumulative = false;
 
 //==== Data manipulation
 
@@ -28,11 +30,6 @@ var yAxis = d3.svg.axis()
     .scale(y)
     .orient("left");
 
-var area = d3.svg.area()
-    .x(function(d) { return x(d.date); })
-    .y0(HEIGHT)
-    .y1(function(d) { return y(d.count); });
-
 var svg = d3.select("#plot-area").append("svg")
     .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
     .attr("height", HEIGHT + MARGIN.TOP + MARGIN.BOTTOM)
@@ -40,7 +37,12 @@ var svg = d3.select("#plot-area").append("svg")
     .attr("transform", "translate(" + MARGIN.LEFT + "," + MARGIN.TOP + ")");
 
 function visualise(data) {
-	
+
+	var area = d3.svg.area()
+	    .x(function(d) { return x(d.date); })
+	    .y0(HEIGHT)
+	    .y1(function(d) { return y(d.count); });
+
 	  x.domain(d3.extent(data, function(d) { return d.date; }));
 	  y.domain([0, d3.max(data, function(d) { return d.count; })]);
 
@@ -52,8 +54,15 @@ function visualise(data) {
 	  svg.append("g")
 	      .attr("class", "x axis")
 	      .attr("transform", "translate(0," + HEIGHT + ")")
-	      .call(xAxis);
-
+	      .call(xAxis)
+	    .append("text")	      
+	      //.attr("transform", "rotate(-90)")
+	      .attr("x", WIDTH)
+	      .attr("dx", "-0.71em")
+	      .attr("dy", "-0.71em")
+	      .style("text-anchor", "end")
+	      .text("Date");
+	  
 	  svg.append("g")
 	      .attr("class", "y axis")
 	      .call(yAxis)
@@ -66,14 +75,21 @@ function visualise(data) {
 }
 
 function processResponse(registrationFrequency) {
+	var sum = 0;
 	registrationFrequency.forEach(function(record) {
 		record.date = parseDate(record.date);
-		record.count = +record.count;
+		if (isCumulative) {
+			sum += +record.count;
+			record.count = sum;
+		} else {
+			record.count = +record.count;
+		}
 	  });
 }
 
 function load() {
-	d3.json("/user_statistics/rest/registrations/frequency", function(error, registrationFrequency) {
+	d3.json("/user_statistics/rest/registrations/frequency", function(error, responseData) {
+		registrationFrequency = responseData;
 		processResponse(registrationFrequency);
 		visualise(registrationFrequency);
 	});
@@ -81,5 +97,16 @@ function load() {
 
 load();
 
+
+//---- Additional User Interactions.
+
+function change() {
+	$('#graph-buttons button').removeClass('active');
+	$(this).addClass('active');
+	isCumulative = this.id == 'cumulative';
+	load();
+}
+
+d3.selectAll("button").on("click", change);
 
 
