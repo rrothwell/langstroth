@@ -1,0 +1,15 @@
+
+# Work through the hello analytics tutorial.
+# See: https://developers.google.com/analytics/solutions/articles/hello-analytics-api
+
+# Install the software.
+# See: https://developers.google.com/api-client-library/python/start/installation
+
+sudo pip install --upgrade google-api-python-client
+sudo pip install --upgrade python-gflags
+
+# In the console create a new account then changed the name to:
+# langstroth-user-statistics
+
+# Ensure the Google APIs are turned on.
+# Ensure the analytics API is turned on.
