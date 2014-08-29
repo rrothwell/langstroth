@@ -41,6 +41,8 @@ var area = d3.svg.area()
     .y0(HEIGHT)
     .y1(function(d) { return y(d.count); });
 
+//---- The render function
+
 function visualise(trend) {
 
 	x.domain(d3.extent(trend, function(d) { return d.date; }));
@@ -79,6 +81,8 @@ function visualise(trend) {
 	      .text("User registrations");
 }
 
+//==== Data loading
+
 function processResponse(registrationFrequency) {
 	var trend = [];
 	var sum = 0;
@@ -107,7 +111,7 @@ function load() {
 load();
 
 
-//---- Additional User Interactions.
+//==== User Interactions.
 
 function change() {
 	$('#graph-buttons button').removeClass('active');
