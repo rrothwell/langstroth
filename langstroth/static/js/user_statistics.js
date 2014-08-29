@@ -36,34 +36,39 @@ var svg = d3.select("#plot-area").append("svg")
   .append("g")
     .attr("transform", "translate(" + MARGIN.LEFT + "," + MARGIN.TOP + ")");
 
-function visualise(data) {
+var area = d3.svg.area()
+    .x(function(d) { return x(d.date); })
+    .y0(HEIGHT)
+    .y1(function(d) { return y(d.count); });
 
-	var area = d3.svg.area()
-	    .x(function(d) { return x(d.date); })
-	    .y0(HEIGHT)
-	    .y1(function(d) { return y(d.count); });
+function visualise(trend) {
 
-	  x.domain(d3.extent(data, function(d) { return d.date; }));
-	  y.domain([0, d3.max(data, function(d) { return d.count; })]);
-
-	  svg.append("path")
-	      .datum(data)
-	      .attr("class", "area")
-	      .attr("d", area);
-
+	x.domain(d3.extent(trend, function(d) { return d.date; }));
+	y.domain([0, d3.max(trend, function(d) { return d.count; })]);
+  
+	var path = svg.selectAll("path").data([trend]);	
+	path.attr("class", "area").attr("d", area);
+	path.enter().append("path").attr("class", "area").attr("d", area);
+	path.exit().remove();
+  
+	var xAxisG = svg.selectAll("g.x");
+	xAxisG.remove();
+	
 	  svg.append("g")
 	      .attr("class", "x axis")
 	      .attr("transform", "translate(0," + HEIGHT + ")")
 	      .call(xAxis)
 	    .append("text")	      
-	      //.attr("transform", "rotate(-90)")
 	      .attr("x", WIDTH)
 	      .attr("dx", "-0.71em")
 	      .attr("dy", "-0.71em")
 	      .style("text-anchor", "end")
 	      .text("Date");
 	  
-	  svg.append("g")
+		var yAxisG = svg.selectAll("g.y");
+		yAxisG.remove();
+
+		svg.append("g")
 	      .attr("class", "y axis")
 	      .call(yAxis)
 	    .append("text")
@@ -75,23 +80,27 @@ function visualise(data) {
 }
 
 function processResponse(registrationFrequency) {
+	var trend = [];
 	var sum = 0;
 	registrationFrequency.forEach(function(record) {
-		record.date = parseDate(record.date);
+		var item = {};
+		item.date = parseDate(record.date);
 		if (isCumulative) {
 			sum += +record.count;
-			record.count = sum;
+			item.count = sum;
 		} else {
-			record.count = +record.count;
+			item.count = +record.count;
 		}
+		trend.push(item);
 	  });
+	return trend;
 }
 
 function load() {
 	d3.json("/user_statistics/rest/registrations/frequency", function(error, responseData) {
 		registrationFrequency = responseData;
-		processResponse(registrationFrequency);
-		visualise(registrationFrequency);
+		var trend = processResponse(registrationFrequency);
+		visualise(trend);
 	});
 }
 
@@ -104,7 +113,8 @@ function change() {
 	$('#graph-buttons button').removeClass('active');
 	$(this).addClass('active');
 	isCumulative = this.id == 'cumulative';
-	load();
+	var trend = processResponse(registrationFrequency);
+	visualise(trend);
 }
 
 d3.selectAll("button").on("click", change);
