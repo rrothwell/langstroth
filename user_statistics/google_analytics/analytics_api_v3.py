@@ -1,15 +1,25 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Licensed by Google under the Apache 2.0 License.
+# Original licensed by Google under the Apache 2.0 License.
+
+# For an over view see: https://developers.google.com/analytics/devguides/reporting/core/v3/
+# For getting started see: https://developers.google.com/analytics/resources/tutorials/hello-analytics-api
+# For a description of the API syntax see: https://developers.google.com/analytics/devguides/reporting/core/v3/reference
+# For a description of the dimensions and metrics see: https://developers.google.com/analytics/devguides/reporting/core/dimsmets
 
 import sys
+from datetime import date
 
 # import the Auth Helper class
 import analytics_api_v3_auth
 
 from apiclient.errors import HttpError
 from oauth2client.client import AccessTokenRefreshError
+
+ANALYTICS_START_DATE = '2013-08-08'
+PRINT_LABEL_TEMPLATE = 'New users on: %s: %s'
+PRINT_TOTAL_TEMPLATE = 'Total new users over period: %d'
 
 def main(argv):
     # Step 1. Get an analytics service object.
@@ -45,17 +55,17 @@ def get_first_profile_id(service):
     
     if accounts.get('items'):
         # Get the first Google Analytics account
-        firstAccountId = accounts.get('items')[0].get('id')
+        first_account_id = accounts.get('items')[0].get('id')
         
         # Get a list of all the Web Properties for the first account
-        webproperties = service.management().webproperties().list(accountId=firstAccountId).execute()
+        web_properties = service.management().webproperties().list(accountId=first_account_id).execute()
         
-        if webproperties.get('items'):
+        if web_properties.get('items'):
             # Get the first Web Property ID
-            firstWebpropertyId = webproperties.get('items')[0].get('id')
+            first_web_property_id = web_properties.get('items')[0].get('id')
             
             # Get a list of all Views (Profiles) for the first Web Property of the first Account
-            profiles = service.management().profiles().list(accountId=firstAccountId, webPropertyId=firstWebpropertyId).execute()
+            profiles = service.management().profiles().list(accountId=first_account_id, webPropertyId=first_web_property_id).execute()
             
             if profiles.get('items'):
                 # return the first View (Profile) ID
@@ -63,20 +73,29 @@ def get_first_profile_id(service):
     
     return None
 
+# See: https://developers.google.com/analytics/devguides/reporting/core/dimsmets#view=detail&group=user
 def get_results(service, profile_id):
+    current_end_date = date.today().strftime('%Y-%m-%d')
     # Use the Analytics Service Object to query the Core Reporting API
     return service.data().ga().get(
         ids='ga:' + profile_id,
-        start_date='2012-03-03',
-        end_date='2014-08-29',
-        metrics='ga:sessions').execute()
+        start_date= ANALYTICS_START_DATE,
+        end_date=current_end_date,
+        metrics='ga:newUsers',
+        dimensions='ga:date',
+        sort='ga:date').execute()
         
 def print_results(results):
     # Print data nicely for the user.
     if results:
         print 'First View (Profile): %s' % results.get('profileInfo').get('profileName')
-        print 'Total Sessions: %s' % results.get('rows')[0][0]
-        
+        result_list = results.get('rows')
+        print "Result count %s: " % len(result_list)
+        total_new_users = 0
+        for result in result_list:
+            print PRINT_LABEL_TEMPLATE % (result[0], result[1])
+            total_new_users += int(result[1])
+        print PRINT_TOTAL_TEMPLATE % total_new_users        
     else:
         print 'No results found'
         
