@@ -2,6 +2,7 @@ from json import dumps
 from django.http import HttpResponse
 from django.shortcuts import render
 from user_statistics.models.registration import UserRegistration
+from user_statistics.models.google_analytics import GoogleAnalytics
 
 # Web pages
 
@@ -23,6 +24,7 @@ def registrations_history(request):
 
 def registrations_frequency(request):
     registration_frequency = UserRegistration.frequency()
+    #registration_frequency = GoogleAnalytics.frequency()
     json_string = dumps(registration_frequency)
     return HttpResponse(json_string, "application/json")
    

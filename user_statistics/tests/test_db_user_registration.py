@@ -33,7 +33,8 @@ class UserRegistrationDBTest(TestCase):
         expected_list = [{'date':'2014-02-16', 'count': 1}, 
         {'date':'2014-03-16', 'count': 1}]
         actual_list = UserRegistration.frequency()
-        self.assertEqual(2, len(actual_list))
+        # The code now fills in empty bins over the entire date range on a daily basis.
+        self.assertEqual(29, len(actual_list))
         self.assertEqual(expected_list, actual_list)
                
     def test_frequency_4_items_in_2_separate_bins(self):
@@ -42,6 +43,7 @@ class UserRegistrationDBTest(TestCase):
         expected_list = [{'date':'2014-02-16', 'count': 2}, 
         {'date':'2014-03-16', 'count': 2}]
         actual_list = UserRegistration.frequency()
-        self.assertEqual(2, len(actual_list))
+        # The code now fills in empty bins over the entire date range on a daily basis.
+        self.assertEqual(29, len(actual_list))
         self.assertEqual(expected_list, actual_list)
 
