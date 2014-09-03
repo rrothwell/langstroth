@@ -41,6 +41,7 @@ Thumbs.db
 ######################
 lxml.output
 private_data/*
+private_data/ga_local_application 
 # nectar_allocations/fixtures/allocation_requests.json
 nectar_allocations/fixtures/nectar_allocations_dump_all.json
 langstroth/data/allocation_tree.json
