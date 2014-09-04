@@ -24,10 +24,12 @@ sudo mv /usr/local/django/langstroth /usr/local/django/langstroth-$TODAY
 sudo mv ~/langstroth /usr/local/django
 
 # Keep Apache2 and langstroth.conf happy.
-# 1. Logging destination
+# 1a. Logging destination for Apache. 
+# Should match contents of: /etc/apache2/sites-enabled/langstroth.conf.
 sudo mkdir -p /usr/local/django/langstroth/apache/logs
 sudo chmod ugo+w /usr/local/django/langstroth/apache/logs
 
+# 1b. Logging destination for django/langstroth webapp.
 sudo mkdir -p /usr/local/django/langstroth/logs
 sudo chmod ugo+w /usr/local/django/langstroth/logs
 
@@ -45,3 +47,6 @@ sudo cp -R /usr/local/django/langstroth/langstroth/data/* /usr/local/django/lang
 
 #Set as UAT environment
 sudo sed -i 's/CURRENT_ENVIRONMENT = DEV_ENVIRONMENT/CURRENT_ENVIRONMENT = UAT_ENVIRONMENT/' /usr/local/django/langstroth/langstroth/settings.py
+
+# Edit this 'asecret' password on the UAT/PROD server.
+sudo sed -i 's/UAT_DUMMY_PASSWORD/asecret/' /usr/local/django/langstroth/langstroth/settings.py
