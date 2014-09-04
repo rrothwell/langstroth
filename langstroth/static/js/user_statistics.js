@@ -6,7 +6,10 @@ var isCumulative = false;
 
 //==== String utilities
 
-var parseDate = d3.time.format("%Y-%m-%d").parse;
+var dateFormat = d3.time.format("%Y-%m-%d");
+var monthFormat = d3.time.format("%m");
+var yearFormat = d3.time.format("%Y");
+var parseDate = dateFormat.parse;
 
 //==== Data visualisation
 
@@ -24,7 +27,15 @@ var y = d3.scale.linear()
 
 var xAxis = d3.svg.axis()
     .scale(x)
-    .orient("bottom");
+    .orient("bottom")
+    .tickFormat(function(d, i) {
+    	var month = d.getMonth();
+    	if (month == 0) {
+        	return yearFormat(d);
+    	} else {
+    		return monthFormat(d);
+    	}
+    });
 
 var yAxis = d3.svg.axis()
     .scale(y)
@@ -41,10 +52,16 @@ var area = d3.svg.area()
     .y0(HEIGHT)
     .y1(function(d) { return y(d.count); });
 
+//---- The render function
+
 function visualise(trend) {
 
-	x.domain(d3.extent(trend, function(d) { return d.date; }));
-	y.domain([0, d3.max(trend, function(d) { return d.count; })]);
+	x.domain(d3.extent(trend, function(d) { 
+		return d.date; 
+	}));
+	y.domain([0, d3.max(trend, function(d) { 
+		return d.count;
+	})]);
   
 	var path = svg.selectAll("path").data([trend]);	
 	path.attr("class", "area").attr("d", area);
@@ -79,6 +96,8 @@ function visualise(trend) {
 	      .text("User registrations");
 }
 
+//==== Data loading
+
 function processResponse(registrationFrequency) {
 	var trend = [];
 	var sum = 0;
@@ -106,8 +125,7 @@ function load() {
 
 load();
 
-
-//---- Additional User Interactions.
+//==== User Interactions.
 
 function change() {
 	$('#graph-buttons button').removeClass('active');
