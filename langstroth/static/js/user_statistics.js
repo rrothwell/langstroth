@@ -1,14 +1,12 @@
 ////// Area Plot of NeCTAR User Registration History
 var registrationFrequency = [];
-var isCumulative = false;
+var isCumulative = true;
 
 //==== Data manipulation
 
 //==== String utilities
 
 var dateFormat = d3.time.format("%Y-%m-%d");
-var monthFormat = d3.time.format("%m");
-var yearFormat = d3.time.format("%Y");
 var parseDate = dateFormat.parse;
 
 //==== Data visualisation
@@ -28,18 +26,19 @@ var y = d3.scale.linear()
 var xAxis = d3.svg.axis()
     .scale(x)
     .orient("bottom")
+    .innerTickSize([-HEIGHT])
+    .outerTickSize([-HEIGHT])
+    .tickPadding([8])
     .tickFormat(function(d, i) {
-    	var month = d.getMonth();
-    	if (month == 0) {
-        	return yearFormat(d);
-    	} else {
-    		return monthFormat(d);
-    	}
+        	return dateFormat(d);
     });
 
 var yAxis = d3.svg.axis()
     .scale(y)
-    .orient("left");
+    .orient("left")
+    .innerTickSize([-WIDTH])
+    .outerTickSize([-WIDTH])
+    .tickPadding([8]);
 
 var svg = d3.select("#plot-area").append("svg")
     .attr("width", WIDTH + MARGIN.LEFT + MARGIN.RIGHT)
@@ -75,12 +74,13 @@ function visualise(trend) {
 	      .attr("class", "x axis")
 	      .attr("transform", "translate(0," + HEIGHT + ")")
 	      .call(xAxis)
-	    .append("text")	      
-	      .attr("x", WIDTH)
-	      .attr("dx", "-0.71em")
-	      .attr("dy", "-0.71em")
-	      .style("text-anchor", "end")
-	      .text("Date");
+	    //.append("text")	      
+	      //.attr("x", WIDTH)
+	      //.attr("dx", "-0.71em")
+	      //.attr("dy", "-0.71em")
+	      //.style("text-anchor", "end")
+	      //.attr("class", "axis label")
+	      //.text("Date");
 	  
 		var yAxisG = svg.selectAll("g.y");
 		yAxisG.remove();
@@ -88,12 +88,14 @@ function visualise(trend) {
 		svg.append("g")
 	      .attr("class", "y axis")
 	      .call(yAxis)
-	    .append("text")
-	      .attr("transform", "rotate(-90)")
-	      .attr("y", 6)
-	      .attr("dy", ".71em")
-	      .style("text-anchor", "end")
-	      .text("User registrations");
+	    //.append("text")
+	      //.attr("transform", "rotate(-90)")
+	      //.attr("y", 6)
+	      //.attr("dy", ".71em")
+	      //.style("text-anchor", "end")
+	      //.attr("class", "axis label")
+	      //.text("User registrations")
+	      ;
 }
 
 //==== Data loading

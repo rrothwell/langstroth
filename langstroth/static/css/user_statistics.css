@@ -5,6 +5,22 @@
   shape-rendering: crispEdges;
 }
 
-.area {
-  fill: steelblue;
+.axis scale-text {
 }
+
+g.tick line {
+  opacity: 0.15;
+}
+
+g.tick text {
+  font: 400 12px Arial;
+  y: 10px;
+}
+
+.area {
+  fill: #1f77b4;
+  stroke: #1f77b4;
+  fill-opacity: 0.7;
+}
+
+
