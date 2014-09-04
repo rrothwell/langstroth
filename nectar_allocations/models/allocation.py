@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.db.models import Q
-
+import re
 from nectar_allocations.switch import Switch
 
 class AllocationRequest(models.Model):
@@ -134,8 +134,10 @@ class AllocationRequest(models.Model):
         allocation_summary['id'] = self.id
         allocation_summary['institution'] = AllocationRequest.institution_from_email(self.contact_email)
         allocation_summary['project_name'] = self.project_name
-        allocation_summary['usage_patterns'] = self.usage_patterns
-        #allocation_summary['use_case'] = self.use_case
+        # Redact any email addresses.
+        allocation_summary['usage_patterns'] = AllocationRequest.redact_all_emails(self.usage_patterns)
+        # Redact any email addresses.
+        allocation_summary['use_case'] = AllocationRequest.redact_all_emails(self.use_case)
         AllocationRequest.apply_for_code_to_summary(allocation_summary, code)
         if code == self.field_of_research_1:
             self.apply_partitioned_quotas(allocation_summary, self.for_percentage_1)
@@ -151,6 +153,15 @@ class AllocationRequest(models.Model):
         domain = AllocationRequest.strip_email_group(email_domain)
         return domain;
    
+    # See: http://www.regular-expressions.info/email.html
+    # Ignore case as only [A-Z] character class is specified.
+    EMAIL_ADDRESS_REGEX = re.compile(r'\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b', re.IGNORECASE)
+    REPLACEMENT = r'[XXXX]'
+    
+    @staticmethod
+    def redact_all_emails(description):
+        redacted_description = AllocationRequest.EMAIL_ADDRESS_REGEX.sub(AllocationRequest.REPLACEMENT, description)
+        return redacted_description;   
 
     @staticmethod
     def partition_active_allocations(): 
@@ -189,7 +200,7 @@ class AllocationRequest(models.Model):
             twig['id'] = allocation['id']
             twig['projectName'] = allocation['project_name']
             twig['institution'] = allocation['institution']
-            #twig['useCase'] = allocation['use_case']
+            twig['useCase'] = allocation['use_case']
             twig['usagePatterns'] = allocation['usage_patterns']
             twig['instanceQuota'] = allocation['instance_quota']
             twig['coreQuota'] = allocation['core_quota']
@@ -225,7 +236,7 @@ class AllocationRequest(models.Model):
                         allocation_items['id'] = allocation_summary['id']
                         allocation_items['name'] = allocation_summary['projectName']
                         allocation_items['institution'] = allocation_summary['institution']
-                        #allocation_items['useCase'] = allocation_summary['useCase']
+                        allocation_items['useCase'] = allocation_summary['useCase']
                         allocation_items['usagePatterns'] = allocation_summary['usagePatterns']
                         allocation_items['instanceQuota'] = allocation_summary['instanceQuota']
                         allocation_items['coreQuota'] = allocation_summary['coreQuota']
@@ -261,8 +272,10 @@ class AllocationRequest(models.Model):
         project_record['institution'] = AllocationRequest.institution_from_email(allocation_request.contact_email)
         project_record['start_date'] = allocation_request.start_date.strftime('%Y-%m-%d')
         project_record['end_date'] = allocation_request.end_date.strftime('%Y-%m-%d')
-        #project_record['use_case'] = allocation_request.use_case
-        project_record['usage_patterns'] = allocation_request.usage_patterns
+        # Redact any email addresses.
+        project_record['use_case'] = AllocationRequest.redact_all_emails(allocation_request.use_case)
+        # Redact any email addresses.
+        project_record['usage_patterns'] = AllocationRequest.redact_all_emails(allocation_request.usage_patterns)
         project_record['instance_quota'] = allocation_request.instance_quota
         project_record['core_quota'] = allocation_request.core_quota
         project_record['instances'] = allocation_request.instances
