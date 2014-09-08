@@ -11,6 +11,9 @@ UAT_ENVIRONMENT = 2
 CURRENT_ENVIRONMENT = DEV_ENVIRONMENT
 
 TEST_MODE = 'DJANGO_TEST' in environ and environ['DJANGO_TEST'] == 'True'
+
+# Either set these values as environment variables in the Eclipse IDE
+# Or have the install_uat.sh script sed them to the real passwords.
 DB_PASSWORD = environ['LANGSTROTH_DEV_DB_PASSWORD']
 NAGIOS_PASSWORD = environ['LANGSTROTH_DEV_NAGIOS_PASSWORD']
 
