@@ -45,3 +45,8 @@ sudo cp -R /usr/local/django/langstroth/langstroth/data/* /usr/local/django/lang
 
 #Set as UAT environment
 sudo sed -i 's/CURRENT_ENVIRONMENT = DEV_ENVIRONMENT/CURRENT_ENVIRONMENT = UAT_ENVIRONMENT/' /usr/local/django/langstroth/langstroth/settings.py
+
+# Replace  somesecretdb and somesecretnagios with the real passwords 
+# when the file is installed on the UAT/demo server.
+sudo sed -i 's/NAGIOS_PASSWORD = /NAGIOS_PASSWORD = somesecretdb #/' /usr/local/django/langstroth/langstroth/settings.py
+sudo sed -i 's/DB_PASSWORD = /DB_PASSWORD = somesecretnagios #/' /usr/local/django/langstroth/langstroth/settings.py
