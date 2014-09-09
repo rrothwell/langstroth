@@ -1,17 +1,8 @@
-////// Area Plot of NeCTAR User Registration History
 var registrationFrequency = [];
 var isCumulative = true;
 
-//==== Data manipulation
-
-//==== String utilities
-
 var dateFormat = d3.time.format("%Y-%m-%d");
 var parseDate = dateFormat.parse;
-
-//==== Data visualisation
-
-//---- Visualisation Constants
 
 var MARGIN = {TOP: 20, RIGHT: 20, BOTTOM: 30, LEFT: 50},
 WIDTH = 960 - MARGIN.LEFT - MARGIN.RIGHT,
@@ -73,14 +64,7 @@ function visualise(trend) {
 	  svg.append("g")
 	      .attr("class", "x axis")
 	      .attr("transform", "translate(0," + HEIGHT + ")")
-	      .call(xAxis)
-	    //.append("text")	      
-	      //.attr("x", WIDTH)
-	      //.attr("dx", "-0.71em")
-	      //.attr("dy", "-0.71em")
-	      //.style("text-anchor", "end")
-	      //.attr("class", "axis label")
-	      //.text("Date");
+	      .call(xAxis);
 	  
 		var yAxisG = svg.selectAll("g.y");
 		yAxisG.remove();
@@ -88,17 +72,8 @@ function visualise(trend) {
 		svg.append("g")
 	      .attr("class", "y axis")
 	      .call(yAxis)
-	    //.append("text")
-	      //.attr("transform", "rotate(-90)")
-	      //.attr("y", 6)
-	      //.attr("dy", ".71em")
-	      //.style("text-anchor", "end")
-	      //.attr("class", "axis label")
-	      //.text("User registrations")
 	      ;
 }
-
-//==== Data loading
 
 function processResponse(registrationFrequency) {
 	var trend = [];
@@ -126,8 +101,6 @@ function load() {
 }
 
 load();
-
-//==== User Interactions.
 
 function change() {
 	$('#graph-buttons button').removeClass('active');
