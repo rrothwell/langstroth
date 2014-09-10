@@ -7,8 +7,6 @@ var frequencyFormat = d3.format(',.0f');
 
 var svg = d3.select("#plot-area").append("svg");
 
-//---- The render function
-
 function visualise(trend) {
 		
 	  nv.addGraph(function() {
@@ -34,7 +32,6 @@ function visualise(trend) {
 		    chart.yAxis
 		    .tickFormat(frequencyFormat);
 
-			//var path = svg.selectAll("path").data([trend]).call(chart);	
 			svg.datum(trend).call(chart);	
 
 		    nv.utils.windowResize(chart.update);
@@ -44,7 +41,7 @@ function visualise(trend) {
   
 }
 
-function processResponse(registrationFrequency) {
+function processResponse(registrationFrequency, legendKey) {
 	var trend = [];
 	var sum = 0;
 	registrationFrequency.forEach(function(record) {
@@ -60,7 +57,7 @@ function processResponse(registrationFrequency) {
 	  });
 
 	var wrappedTrend = {};
-	wrappedTrend['key'] = 'User Registrations';
+	wrappedTrend['key'] = legendKey;
 	wrappedTrend['values'] = trend;
 	return [wrappedTrend];
 }
@@ -68,7 +65,8 @@ function processResponse(registrationFrequency) {
 function load() {
 	d3.json("/user_statistics/rest/registrations/frequency", function(error, responseData) {
 		registrationFrequency = responseData;
-		var trend = processResponse(registrationFrequency);
+		var legendKey = 'User Registrations At Month';
+		var trend = processResponse(registrationFrequency, legendKey);
 		visualise(trend);
 	});
 }
@@ -79,7 +77,8 @@ function change() {
 	$('#graph-buttons button').removeClass('active');
 	$(this).addClass('active');
 	isCumulative = this.id == 'cumulative';
-	var trend = processResponse(registrationFrequency);
+	var legendKey = isCumulative ? 'User Registrations At Month' : 'User Registrations Per Month';
+	var trend = processResponse(registrationFrequency, legendKey);
 	visualise(trend);
 }
 
