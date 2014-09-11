@@ -1,5 +1,7 @@
 from django.test import TestCase
 
+from datetime import date
+
 from user_statistics.models.registration import UserRegistration
 
 class UserRegistrationDBTest(TestCase):
@@ -31,13 +33,13 @@ class UserRegistrationDBTest(TestCase):
                
     def test_frequency_2_items_in_2_separate_bins(self):
         expected_list = [
-        {'date':'2014-02-16', 'count': 1}, 
-        {'date':'2014-02-17', 'count': 0}, 
-        {'date':'2014-02-18', 'count': 0}, 
-        {'date':'2014-02-19', 'count': 0}, 
-        {'date':'2014-02-20', 'count': 0}, 
-        {'date':'2014-02-21', 'count': 0}, 
-        {'date':'2014-02-22', 'count': 1}
+        {'date':date(2014,02,16), 'count': 1}, 
+        {'date':date(2014,02,17), 'count': 0}, 
+        {'date':date(2014,02,18), 'count': 0}, 
+        {'date':date(2014,02,19), 'count': 0}, 
+        {'date':date(2014,02,20), 'count': 0}, 
+        {'date':date(2014,02,21), 'count': 0}, 
+        {'date':date(2014,02,22), 'count': 1}
         ]
         actual_list = UserRegistration.frequency()
         # The code now fills in empty bins over the entire date range on a daily basis.
@@ -48,13 +50,13 @@ class UserRegistrationDBTest(TestCase):
         UserRegistration.objects.create(user_name="aaaa", creation_time="2014-02-16T05:07:00Z")
         UserRegistration.objects.create(user_name="4bbbb", creation_time="2014-02-22T00:59:45Z")
         expected_list = [
-        {'date':'2014-02-16', 'count': 2}, 
-        {'date':'2014-02-17', 'count': 0}, 
-        {'date':'2014-02-18', 'count': 0}, 
-        {'date':'2014-02-19', 'count': 0}, 
-        {'date':'2014-02-20', 'count': 0}, 
-        {'date':'2014-02-21', 'count': 0}, 
-        {'date':'2014-02-22', 'count': 2}
+        {'date':date(2014,02,16), 'count': 2}, 
+        {'date':date(2014,02,17), 'count': 0}, 
+        {'date':date(2014,02,18), 'count': 0}, 
+        {'date':date(2014,02,19), 'count': 0}, 
+        {'date':date(2014,02,20), 'count': 0}, 
+        {'date':date(2014,02,21), 'count': 0}, 
+        {'date':date(2014,02,22), 'count': 2}
         ]
         actual_list = UserRegistration.frequency()
         # The code now fills in empty bins over the entire date range on a daily basis.

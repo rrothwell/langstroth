@@ -1,4 +1,5 @@
 import datetime
+from datetime import timedelta
 
 from django.db import models
 from django.conf import settings
@@ -66,11 +67,52 @@ class UserRegistration(models.Model):
             frequency_items.append(item)
         # Data were stored in dictionary so not necessarily sorted by date, so resort by date.
         frequency_items = sorted(frequency_items, key=lambda item: item['date']) 
-        # Convert all dates to string dates.
-        for item in frequency_items:
-            item['date'] = item['date'].strftime('%Y-%m-%d')
         return frequency_items
-             
+    
+    @staticmethod
+    def monthly_frequency():
+        daily_registrations = UserRegistration.frequency() 
+        first = daily_registrations[0]
+        last = daily_registrations[len(daily_registrations) - 1]
+        first_date = first['date']
+        last_date = last['date']
+        first_month = datetime.date(first_date.year, first_date.month, 1)
+        last_month = datetime.date(last_date.year, last_date.month, 1)
+        end_of_last_month = UserRegistration.last_date_of_month(last_month)
+        if last_date != end_of_last_month:
+            last_month = (last_month - timedelta(days = 1)).replace(day=1)
+        known_months = dict()
+        date = first_month
+        # Build bins as a map.
+        while date <= last_month:
+            known_months[date] = 0
+            date = (date + timedelta(days=31)).replace(day=1) 
+        # Populate bins         
+        for registration in daily_registrations:
+            day_date = registration['date']
+            day_count = registration['count']
+            month = datetime.date(day_date.year, day_date.month, 1)
+            if month in known_months:
+                known_months[month] += day_count
+        monthly_registrations = []
+        # Reorganise bins into a date sorted array.
+        for month in known_months:
+            item = {'date': month, 'count': known_months[month]}
+            monthly_registrations.append(item)
+        monthly_registrations = sorted(monthly_registrations, key=lambda item: item['date']) 
+        return monthly_registrations 
+    
+    @staticmethod
+    def mid_month(date):
+        begin_month_date = datetime.date(date.year, date.month, 1)
+        end_month_date = (date + timedelta(days=31)).replace(day=1)
+        end_month_date += datetime.timedelta(days = -1) 
+        middle_day =  (end_month_date.day + begin_month_date.day) / 2
+        return  datetime.date(date.year, date.month, middle_day)
+    
+    @staticmethod
+    def last_date_of_month(date):
+        return (date + timedelta(days=31)).replace(day=1) - timedelta(days=1)
   
     @staticmethod
     def user_dict():
