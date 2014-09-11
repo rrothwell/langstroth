@@ -1,4 +1,5 @@
 # Django settings for langstroth project.
+import logging
 from os import path
 from os import environ
 
@@ -265,3 +266,10 @@ LOGGING = {
         },    
     }
 }
+
+LOG = logging.getLogger('custom.debug')
+#LOG.debug("Database password: " + DB_PASSWORD)
+#LOG.debug("Nagios password: " + NAGIOS_PASSWORD)
+
+
+
