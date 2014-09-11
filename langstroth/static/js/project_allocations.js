@@ -7,8 +7,8 @@ var headings = {
 	"project_name" : "Project name",
 	"start_date" : "Start date",
 	"end_date" : "End date",
-	"use_case" : " Use case",
-	"usage_patterns" : "Usage patterns",
+//	"use_case" : " Use case",
+//	"usage_patterns" : "Usage patterns",
 	"instance_quota" : "Instance quota",
 	"core_quota" : "Core quota",
 	"submit_date" : "Submit date"
