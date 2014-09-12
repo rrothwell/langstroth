@@ -101,7 +101,6 @@ elif CURRENT_ENVIRONMENT == PROD_ENVIRONMENT:
 
 NAGIOS_SERVICE_GROUP = 'f5-endpoints'
 
-
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = []
@@ -228,8 +227,6 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 # the site admins on every HTTP 500 error when DEBUG=False.
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
-
-print path.join(path.dirname(__file__), "../logs/debug.log")
                 
 LOGGING = {
     'version': 1,
