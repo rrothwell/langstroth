@@ -1,10 +1,12 @@
 from django.db import models
 from django.conf import settings
 from django.db.models import Q
-
+import re
 from nectar_allocations.switch import Switch
 
 class AllocationRequest(models.Model):
+    
+    showPrivateFields = False
 
     STATUS_CHOICES = (
         ('N', 'N'),
@@ -134,8 +136,12 @@ class AllocationRequest(models.Model):
         allocation_summary['id'] = self.id
         allocation_summary['institution'] = AllocationRequest.institution_from_email(self.contact_email)
         allocation_summary['project_name'] = self.project_name
-        allocation_summary['usage_patterns'] = self.usage_patterns
-        #allocation_summary['use_case'] = self.use_case
+        # Redact any email addresses.
+        if AllocationRequest.showPrivateFields:
+            allocation_summary['usage_patterns'] = AllocationRequest.apply_privacy_policy(self.usage_patterns)
+        # Redact any email addresses.
+        if AllocationRequest.showPrivateFields:
+            allocation_summary['use_case'] = AllocationRequest.apply_privacy_policy(self.use_case)
         AllocationRequest.apply_for_code_to_summary(allocation_summary, code)
         if code == self.field_of_research_1:
             self.apply_partitioned_quotas(allocation_summary, self.for_percentage_1)
@@ -151,6 +157,20 @@ class AllocationRequest(models.Model):
         domain = AllocationRequest.strip_email_group(email_domain)
         return domain;
    
+    # See: http://www.regular-expressions.info/email.html
+    # Ignore case as only [A-Z] character class is specified.
+    EMAIL_ADDRESS_REGEX = re.compile(r'\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b', re.IGNORECASE)
+    REPLACEMENT = r'[XXXX]'
+    
+    @staticmethod
+    def redact_all_emails(description):
+        redacted_description = AllocationRequest.EMAIL_ADDRESS_REGEX.sub(AllocationRequest.REPLACEMENT, description)
+        return redacted_description;   
+    
+    @staticmethod
+    def apply_privacy_policy(description):
+        redacted_description = AllocationRequest.redact_all_emails(description)
+        return redacted_description;   
 
     @staticmethod
     def partition_active_allocations(): 
@@ -189,8 +209,10 @@ class AllocationRequest(models.Model):
             twig['id'] = allocation['id']
             twig['projectName'] = allocation['project_name']
             twig['institution'] = allocation['institution']
-            #twig['useCase'] = allocation['use_case']
-            twig['usagePatterns'] = allocation['usage_patterns']
+            if AllocationRequest.showPrivateFields:
+                twig['useCase'] = allocation['use_case']
+            if AllocationRequest.showPrivateFields:
+                twig['usagePatterns'] = allocation['usage_patterns']
             twig['instanceQuota'] = allocation['instance_quota']
             twig['coreQuota'] = allocation['core_quota']
             branch_minor[allocation_code_6].append(twig)
@@ -225,8 +247,10 @@ class AllocationRequest(models.Model):
                         allocation_items['id'] = allocation_summary['id']
                         allocation_items['name'] = allocation_summary['projectName']
                         allocation_items['institution'] = allocation_summary['institution']
-                        #allocation_items['useCase'] = allocation_summary['useCase']
-                        allocation_items['usagePatterns'] = allocation_summary['usagePatterns']
+                        if AllocationRequest.showPrivateFields:
+                            allocation_items['useCase'] = allocation_summary['useCase']
+                        if AllocationRequest.showPrivateFields:
+                            allocation_items['usagePatterns'] = allocation_summary['usagePatterns']
                         allocation_items['instanceQuota'] = allocation_summary['instanceQuota']
                         allocation_items['coreQuota'] = allocation_summary['coreQuota']
                         named_children_6['children'].append(allocation_items)            
@@ -236,13 +260,13 @@ class AllocationRequest(models.Model):
     def project_allocations_from_allocation_request_id(allocation_request_id):
         base_request = AllocationRequest.objects.get(pk=allocation_request_id)      
         project_summary = list()
-        project_record = AllocationRequest.project_summary_record(base_request)
+        project_record = AllocationRequest.__project_summary_record(base_request)
         project_summary.append(project_record)
         other_requests = AllocationRequest.objects \
             .filter(project_name = base_request.project_name) \
             .exclude(id = allocation_request_id)
         for other_request in other_requests:
-            project_record = AllocationRequest.project_summary_record(other_request)
+            project_record = AllocationRequest.__project_summary_record(other_request)
             project_summary.append(project_record)
             project_summary.sort(key=lambda project_record: project_record['modified_time'])
         return project_summary
@@ -254,15 +278,19 @@ class AllocationRequest(models.Model):
         return project_summary
     
     @staticmethod
-    def project_summary_record(allocation_request):
+    def __project_summary_record(allocation_request):
         project_record = dict()
         project_record['id'] = allocation_request.id
         project_record['project_name'] = allocation_request.project_name
         project_record['institution'] = AllocationRequest.institution_from_email(allocation_request.contact_email)
         project_record['start_date'] = allocation_request.start_date.strftime('%Y-%m-%d')
         project_record['end_date'] = allocation_request.end_date.strftime('%Y-%m-%d')
-        #project_record['use_case'] = allocation_request.use_case
-        project_record['usage_patterns'] = allocation_request.usage_patterns
+        # Redact any email addresses.
+        if AllocationRequest.showPrivateFields:
+            project_record['use_case'] = AllocationRequest.apply_privacy_policy(allocation_request.use_case)
+        # Redact any email addresses.
+        if AllocationRequest.showPrivateFields:
+            project_record['usage_patterns'] = AllocationRequest.apply_privacy_policy(allocation_request.usage_patterns)
         project_record['instance_quota'] = allocation_request.instance_quota
         project_record['core_quota'] = allocation_request.core_quota
         project_record['instances'] = allocation_request.instances

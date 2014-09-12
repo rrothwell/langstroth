@@ -64,8 +64,7 @@ function restructureAllocations(allocationTree, isCoreQuota) {
 			allocationItem.coreQuota = child.coreQuota;
 			allocationItem.instanceQuota = child.instanceQuota;
 			//allocationItem.useCase = child.useCase.abbreviate(128);			
-			allocationItem.useCase = "Redacted";			
-			allocationItem.usagePattern = child.usagePattern;			
+			//allocationItem.usagePattern = child.usagePattern;			
 			sum = isCoreQuota ? child.coreQuota : child.instanceQuota;
     	}
     	allocationItem.target = name;
@@ -399,14 +398,14 @@ var totalText = statisticsArea.append("text")
  			+ data.instanceQuota
  			+ "</td>"
  			+ "</tr>"
- 			+ "<tr>"
- 			+ "<th>"
- 			+ "Use case: " 
- 			+ "</th>"
- 			+ "<td>"
- 			+ data.useCase 
- 			+ "</td>"
- 			+ "</tr>"
+// 			+ "<tr>"
+// 			+ "<th>"
+// 			+ "Use case: " 
+// 			+ "</th>"
+// 			+ "<td>"
+// 			+ data.useCase 
+// 			+ "</td>"
+// 			+ "</tr>"
  			+ "</table>"
  			+ "</div>";
 		toolTip.html(markup);
