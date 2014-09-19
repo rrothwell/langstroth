@@ -1,9 +1,29 @@
 var registrationFrequency = [];
 var isCumulative = true;
 
+var shortDateFormat = d3.time.format("%Y-%m");
 var dateFormat = d3.time.format("%Y-%m-%d");
 var parseDate = dateFormat.parse;
 var frequencyFormat = d3.format(',.0f');
+
+var xTicks = [];
+var xTickIncrement = 3;
+
+var CUMULATIVE_LABEL = 'User Registrations';
+var FREQUENCY_LABEL = 'User Registrations Per Month';
+
+// Date utilities.
+
+// Date of first day of next month.
+Date.prototype.nextMonth = function() {
+	return 	new Date(this.getFullYear(), this.getMonth() + 1, 1, 0, 0, 0, 0);;
+};
+
+// Date of last day of this month.
+Date.prototype.lastDateOfMonth = function() {
+	return 	new Date(this.getFullYear(), this.getMonth() + 1, 0, 0, 0, 0, 0);;
+};
+
 
 // Build area chart
 
@@ -22,7 +42,7 @@ var areaChart = nv.models.stackedAreaChart()
 	.clipEdge(true);
 	
 	areaChart.xAxis.tickFormat(function(d) {
-	return dateFormat(new Date(d)) ;
+	return shortDateFormat(new Date(d)) ;
 	});
 
 	areaChart.yAxis.tickFormat(frequencyFormat);
@@ -41,8 +61,9 @@ var areaChart = nv.models.stackedAreaChart()
 		.clipEdge(false);
 
 		histoChart.xAxis.tickFormat(function(d) {
-			return dateFormat(new Date(d)) ;
+			return shortDateFormat(new Date(d)) ;
 		});
+		histoChart.xAxis.tickValues(xTicks);
 
 		histoChart.yAxis.tickFormat(frequencyFormat);
 		histoChart.showLegend(true);
@@ -100,15 +121,40 @@ function expandXDomain(trend) {
 	});
 	var lastDate = xExtent[1];
 	lastDate.setMonth(lastDate.getMonth() + 1);
+	xExtent[1] = lastDate.getTime();
 	histoChart.xDomain(xExtent);
+}
+
+function defineXTicks(trend) {
+	var xExtent = d3.extent(trend[0].values, function(d) {
+		return d[0];
+	});
+	var lastTime = xExtent[1];
+	var firstTime = xExtent[0];
+	var tickDate = new Date(firstTime);
+	tickDate = tickDate.nextMonth().lastDateOfMonth();
+	xTicks.push(tickDate.getTime());
+	var tickCount = 0;
+	while (tickDate.getTime() < lastTime) {
+		tickDate = tickDate.nextMonth().lastDateOfMonth();
+		if (tickCount == xTickIncrement) {
+			xTicks.push(tickDate.getTime());
+			tickCount = 0;
+		} else {
+			tickCount++;
+		}
+	}
+	tickDate = tickDate.nextMonth().lastDateOfMonth();
+	xTicks.push(tickDate.getTime());
 }
 
 function load() {
 	d3.json("/user_statistics/rest/registrations/frequency", function(error, responseData) {
 		registrationFrequency = responseData;
-		var legendKey = 'User Registrations At Month';
+		var legendKey = CUMULATIVE_LABEL;
 		var trend = processResponse(registrationFrequency, legendKey);
 		expandXDomain(trend);
+		defineXTicks(trend);
 		visualise(trend, areaChart);
 	});
 }
@@ -121,7 +167,7 @@ function change() {
 	$('#graph-buttons button').removeClass('active');
 	$(this).addClass('active');
 	isCumulative = this.id == 'cumulative';
-	var legendKey = isCumulative ? 'User Registrations At Month' : 'User Registrations Per Month';
+	var legendKey = isCumulative ? CUMULATIVE_LABEL : FREQUENCY_LABEL;
 	var trend = processResponse(registrationFrequency, legendKey);
 	var chart = isCumulative ? areaChart : histoChart;
 	visualise(trend, chart);
