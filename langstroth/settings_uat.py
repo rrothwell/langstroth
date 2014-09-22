@@ -89,12 +89,14 @@ if CURRENT_ENVIRONMENT == DEV_ENVIRONMENT:
     GRAPHITE_URL = "http://graphite.dev.rc.nectar.org.au"
     NAGIOS_AVAILABILITY_URL = NAGIOS_URL
     NAGIOS_STATUS_URL = "http://localhost:8000/static/status.html"
+    import nagios_uat
 elif CURRENT_ENVIRONMENT == UAT_ENVIRONMENT:
     NAGIOS_URL = "http://langstroth.doesntexist.com/static/avail.html"
     NAGIOS_AUTH = ("nectar", NAGIOS_PASSWORD)    # set password via sudo htpasswd /usr/local/nectar/.htpasswd nectar
     GRAPHITE_URL = "http://graphite.dev.rc.nectar.org.au"
     NAGIOS_AVAILABILITY_URL = NAGIOS_URL
     NAGIOS_STATUS_URL = "http://langstroth.doesntexist.com/static/status.html"
+    import nagios_uat
 elif CURRENT_ENVIRONMENT == PROD_ENVIRONMENT:
     NAGIOS_URL = "http://nagios.test/cgi-bin/nagios3/" # Dummy service. Replace in production.
     NAGIOS_AUTH = ("sam", NAGIOS_PASSWORD) # Dummy password. Replace in production.

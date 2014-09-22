@@ -1,12 +1,7 @@
 import logging
-import json
-import calendar
 
 import requests
-import cssselect
-import lxml.etree
 from django.conf import settings
-
 import nagios
 
 LOG = logging.getLogger('custom.debug')
@@ -16,12 +11,12 @@ def get_availability(start_date, end_date):
     LOG.debug("Availability URL: " + url)
     resp = requests.get(url, auth=settings.NAGIOS_AUTH)
     LOG.debug("Availability response: " + resp.text)
-    return parse_availability(resp.text)
+    return nagios.parse_availability(resp.text)
 
 def get_status():
     url = settings.NAGIOS_STATUS_URL    
     resp = requests.get(url, auth=settings.NAGIOS_AUTH)
-    return parse_status(resp.text)
+    return nagios.parse_status(resp.text)
 
 # Monkey patch the production code so it will work 
 # in the non-production (test and uat) environments.   
