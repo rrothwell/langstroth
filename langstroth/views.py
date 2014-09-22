@@ -57,7 +57,6 @@ def index(request):
                "tagline": "",
                "report_range": "%s to Now" % then.strftime('%d, %b %Y')}
     
-    
     context['average'] = availability['average']
     for host in status['hosts'].values():
         for service in host['services']:
@@ -81,7 +80,10 @@ def domain(request):
         "tagline": ""}
     return render(request, "domain.html", context)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> d7e5feac33aabe463c01acac2249f47893c092ac
 INST_TARGETS = [
     ('Melbourne University', "sumSeries(cells.melbourne-qh2.total_instances,cells.melbourne-np.total_instances)"),
     ('Monash University', "cells.monash-01.total_instances"),
@@ -205,4 +207,7 @@ def total_cores_per_domain(request):
     cleaned = cleaned.values()
     cleaned.sort(key=itemgetter('value'))
     return HttpResponse(dumps(cleaned), req.headers['content-type'])
+<<<<<<< HEAD
    
+=======
+>>>>>>> d7e5feac33aabe463c01acac2249f47893c092ac
