@@ -57,7 +57,6 @@ def index(request):
                "tagline": "",
                "report_range": "%s to Now" % then.strftime('%d, %b %Y')}
     
-    
     context['average'] = availability['average']
     for host in status['hosts'].values():
         for service in host['services']:
@@ -205,4 +204,3 @@ def total_cores_per_domain(request):
     cleaned = cleaned.values()
     cleaned.sort(key=itemgetter('value'))
     return HttpResponse(dumps(cleaned), req.headers['content-type'])
-   
