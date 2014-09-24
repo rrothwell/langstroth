@@ -101,5 +101,28 @@ class AllocationTest(unittest.TestCase):
         self.assertEqual(allocation_summary['for_6'], '12')
         self.assertEqual(allocation_summary['for_4'], '12')
         self.assertEqual(allocation_summary['for_2'], '12')
-
+        
+    def test_redact_no_emails(self):
+        self.assertEqual(AllocationRequest.redact_all_emails('Please contact someone for more information'), 'Please contact someone for more information')
+        
+    def test_redact_one_email(self):
+        self.assertEqual(AllocationRequest.redact_all_emails('Please contact joe.bloggs@unimelb.edu.au for more information'), 'Please contact [XXXX] for more information')
+        
+    def test_redact_one_email_with_period(self):
+        self.assertEqual(AllocationRequest.redact_all_emails('Please contact joe.bloggs@unimelb.edu.au.'), 'Please contact [XXXX].')
+        
+    def test_redact_one_email_with_comma(self):
+        self.assertEqual(AllocationRequest.redact_all_emails('Please contact joe.bloggs@unimelb.edu.au,'), 'Please contact [XXXX],')
+        
+    def test_redact_one_email_with_question(self):
+        self.assertEqual(AllocationRequest.redact_all_emails('Please contact joe.bloggs@unimelb.edu.au?'), 'Please contact [XXXX]?')
+        
+    def test_redact_one_email_with_exclamation(self):
+        self.assertEqual(AllocationRequest.redact_all_emails('Please contact joe.bloggs@unimelb.edu.au!'), 'Please contact [XXXX]!')
+        
+    def test_redact_one_email_with_bracket(self):
+        self.assertEqual(AllocationRequest.redact_all_emails('Please contact joe.bloggs@unimelb.edu.au)'), 'Please contact [XXXX])')
+        
+    def test_redact_two_emails_in_field(self):
+        self.assertEqual(AllocationRequest.redact_all_emails('Please contact joe.bloggs@unimelb.edu.au or fred_nerk@google.com for more information'), 'Please contact [XXXX] or [XXXX] for more information')
         

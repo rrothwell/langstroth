@@ -47,3 +47,11 @@ user_statistics/private_data/ga_server_application
 nectar_allocations/fixtures/nectar_allocations_dump_all.json
 langstroth/data/allocation_tree.json
 #logs/*
+langstroth/settings.py
+.project
+.pydevproject
+.settings
+install_uat.sh
+langstroth/data
+langstroth/settings_uat.py
+langstroth/nagios_uat.py

@@ -8,6 +8,11 @@ class AllocationDBTest(TestCase):
     multi_db = True
 
     def setUp(self):
+        self.savedShowPrivacy = AllocationRequest.showPrivateFields       
+        return
+    
+    def tearDown(self):
+        AllocationRequest.showPrivateFields = self.savedShowPrivacy      
         return
         
     def test_fixtures(self):
@@ -121,7 +126,8 @@ class AllocationDBTest(TestCase):
         project_items = children_6['children'][0]
         self.assertEquals('USQ eResearch Services Sandbox', project_items['name'])
         
-    def test_project_allocations_from_allocation_request_id(self):       
+    def test_project_allocations_from_allocation_request_id(self):
+        AllocationRequest.showPrivateFields = True       
         allocation_request_id = 1654
         project_allocations = AllocationRequest.project_allocations_from_allocation_request_id(allocation_request_id)
 
@@ -129,12 +135,24 @@ class AllocationDBTest(TestCase):
         self.assertEquals('UoM_Trajectory_Inference_Attacks', project_allocations[0]['project_name'])
         self.assertEquals('2014-01-06', project_allocations[0]['start_date'])
         self.assertEquals('2014-01-31', project_allocations[0]['end_date'])
-        #expected_usecase = "In this project, an algorithm has been developed to infer a persons road trajectory using POI information sent to a LBS such as Google Maps.\r\n\r\n" 
-        #self.assertEquals(expected_usecase, project_allocations[0]['use_case'])
+        expected_usecase = "In this project, an algorithm has been developed to infer a persons road trajectory using POI information sent to a LBS such as Google Maps.\r\n\r\n Please contact [XXXX]." 
+        self.assertEquals(expected_usecase, project_allocations[0]['use_case'])
+        self.assertEquals('Data is stored on a remote server so no storage is needed. Please contact [XXXX].', project_allocations[0]['usage_patterns'])
+        
+    def test_project_allocations_from_allocation_request_id_with_privacy(self):       
+        AllocationRequest.showPrivateFields = False       
+        allocation_request_id = 1654
+        project_allocations = AllocationRequest.project_allocations_from_allocation_request_id(allocation_request_id)
+
+        self.assertEquals(1, len(project_allocations))
+        self.assertEquals('UoM_Trajectory_Inference_Attacks', project_allocations[0]['project_name'])
+        self.assertEquals('2014-01-06', project_allocations[0]['start_date'])
+        self.assertEquals('2014-01-31', project_allocations[0]['end_date'])
         self.assertFalse('use_case' in project_allocations[0])
-        self.assertEquals('Data is stored on a remote server so no storage is needed.', project_allocations[0]['usage_patterns'])
+        self.assertFalse('usage_patterns' in project_allocations[0])
         
     def test_project_allocations_from_allocation_request_id_with_multi_requests(self):       
+        AllocationRequest.showPrivateFields = True       
         allocation_request_id = 1667
         project_allocations = AllocationRequest.project_allocations_from_allocation_request_id(allocation_request_id)
         self.assertEquals(2, len(project_allocations))
@@ -142,30 +160,68 @@ class AllocationDBTest(TestCase):
         self.assertEquals('USQ eResearch Services Sandbox', project_allocations[0]['project_name'])
         self.assertEquals('2014-02-17', project_allocations[0]['start_date'])
         self.assertEquals('2014-05-17', project_allocations[0]['end_date'])
-        #expected_usecase = "The cloud instances will be used to set up quick demos for researchers at USQ to run test experiments, simulations, modelling and calculations.\r\n\r\n" 
-        #self.assertEquals(expected_usecase, project_allocations[0]['use_case'])
-        self.assertFalse('use_case' in project_allocations[0])
-        self.assertEquals('Many users and small data sets as well as small number of users and large data sets. This will vary depending on the tests and the resesearch group.', project_allocations[0]['usage_patterns'])
+        expected_usecase = "The cloud instances will be used to set up quick demos for researchers at USQ to run test experiments, simulations, modelling and calculations.\r\n\r\n Please contact [XXXX]." 
+        self.assertEquals(expected_usecase, project_allocations[0]['use_case'])
+        self.assertEquals('Many users and small data sets as well as small number of users and large data sets. This will vary depending on the tests and the resesearch group. Please contact [XXXX].', project_allocations[0]['usage_patterns'])
 
         self.assertEquals('USQ eResearch Services Sandbox', project_allocations[1]['project_name'])
         self.assertEquals('2014-02-17', project_allocations[1]['start_date'])
         self.assertEquals('2014-05-17', project_allocations[1]['end_date'])
-        #expected_usecase = "The cloud instances will be used to set up quick demos for researchers at USQ to run test experiments, simulations, modelling and calculations.\r\n\r\n" 
-        #self.assertEquals(expected_usecase, project_allocations[1]['use_case'])
+        expected_usecase = "The cloud instances will be used to set up quick demos for researchers at USQ to run test experiments, simulations, modelling and calculations.\r\n\r\n Please contact [XXXX]." 
+        self.assertEquals(expected_usecase, project_allocations[1]['use_case'])
+        self.assertEquals('Many users and small data sets as well as small number of users and large data sets. This will vary depending on the tests and the resesearch group. Please contact [XXXX].', project_allocations[0]['usage_patterns'])
+        
+    def test_project_allocations_from_allocation_request_id_with_multi_requests_with_privacy(self):       
+        AllocationRequest.showPrivateFields = False       
+        allocation_request_id = 1667
+        project_allocations = AllocationRequest.project_allocations_from_allocation_request_id(allocation_request_id)
+        self.assertEquals(2, len(project_allocations))
+
+        self.assertEquals('USQ eResearch Services Sandbox', project_allocations[0]['project_name'])
+        self.assertEquals('2014-02-17', project_allocations[0]['start_date'])
+        self.assertEquals('2014-05-17', project_allocations[0]['end_date'])
+        self.assertFalse('use_case' in project_allocations[0])
+        self.assertFalse('usage_patterns' in project_allocations[0])
+
+        self.assertEquals('USQ eResearch Services Sandbox', project_allocations[1]['project_name'])
+        self.assertEquals('2014-02-17', project_allocations[1]['start_date'])
+        self.assertEquals('2014-05-17', project_allocations[1]['end_date'])
         self.assertFalse('use_case' in project_allocations[1])
-        self.assertEquals('Many users and small data sets as well as small number of users and large data sets. This will vary depending on the tests and the resesearch group.', project_allocations[0]['usage_patterns'])
         
     def test_projects_from_allocation_request_id(self):       
+        AllocationRequest.showPrivateFields = True       
         allocation_request_id = 1654
         project_summary = AllocationRequest.project_from_allocation_request_id(allocation_request_id)
 
         self.assertEquals('UoM_Trajectory_Inference_Attacks', project_summary['project_name'])
         self.assertEquals('2014-01-06', project_summary['start_date'])
         self.assertEquals('2014-01-31', project_summary['end_date'])
-        #expected_usecase = "In this project, an algorithm has been developed to infer a persons road trajectory using POI information sent to a LBS such as Google Maps.\r\n\r\n" 
-        #self.assertEquals(expected_usecase, project_summary['use_case'])
+        expected_usecase = "In this project, an algorithm has been developed to infer a persons road trajectory using POI information sent to a LBS such as Google Maps.\r\n\r\n Please contact [XXXX]." 
+        self.assertEquals(expected_usecase, project_summary['use_case'])
+        self.assertEquals('Data is stored on a remote server so no storage is needed. Please contact [XXXX].', project_summary['usage_patterns'])
+        self.assertEquals(30, project_summary['instance_quota'])
+        self.assertEquals(30, project_summary['core_quota'])
+        self.assertEquals('2014-01-05', project_summary['submit_date'])
+        self.assertEquals('2014-02-16 23:21:59', project_summary['modified_time'])
+        self.assertEquals(2, project_summary['cores'])
+        self.assertEquals(30, project_summary['instances'])
+        self.assertEquals('080109', project_summary['field_of_research_1'])
+        self.assertEquals(100, project_summary['for_percentage_1'])
+        self.assertEquals(None, project_summary['field_of_research_2'])
+        self.assertEquals(0, project_summary['for_percentage_2'])
+        self.assertEquals(None, project_summary['field_of_research_3'])
+        self.assertEquals(0, project_summary['for_percentage_3'])
+        
+    def test_projects_from_allocation_request_id_with_privacy(self):       
+        AllocationRequest.showPrivateFields = False       
+        allocation_request_id = 1654
+        project_summary = AllocationRequest.project_from_allocation_request_id(allocation_request_id)
+
+        self.assertEquals('UoM_Trajectory_Inference_Attacks', project_summary['project_name'])
+        self.assertEquals('2014-01-06', project_summary['start_date'])
+        self.assertEquals('2014-01-31', project_summary['end_date'])
         self.assertFalse('use_case' in project_summary)
-        self.assertEquals('Data is stored on a remote server so no storage is needed.', project_summary['usage_patterns'])
+        self.assertFalse('usage_patterns' in project_summary)
         self.assertEquals(30, project_summary['instance_quota'])
         self.assertEquals(30, project_summary['core_quota'])
         self.assertEquals('2014-01-05', project_summary['submit_date'])
@@ -180,16 +236,39 @@ class AllocationDBTest(TestCase):
         self.assertEquals(0, project_summary['for_percentage_3'])
         
     def test_projects_from_allocation_request_id_with_multi_requests(self):       
+        AllocationRequest.showPrivateFields = True       
         allocation_request_id = 1667
         project_summary = AllocationRequest.project_from_allocation_request_id(allocation_request_id)
 
         self.assertEquals('USQ eResearch Services Sandbox', project_summary['project_name'])
         self.assertEquals('2014-02-17', project_summary['start_date'])
         self.assertEquals('2014-05-17', project_summary['end_date'])
-        #expected_usecase = "The cloud instances will be used to set up quick demos for researchers at USQ to run test experiments, simulations, modelling and calculations.\r\n\r\n" 
-        #self.assertEquals(expected_usecase, project_summary['use_case'])
+        expected_usecase = "The cloud instances will be used to set up quick demos for researchers at USQ to run test experiments, simulations, modelling and calculations.\r\n\r\n Please contact [XXXX]." 
+        self.assertEquals(expected_usecase, project_summary['use_case'])
+        self.assertEquals('Many users and small data sets as well as small number of users and large data sets. This will vary depending on the tests and the resesearch group. Please contact [XXXX].', project_summary['usage_patterns'])
+        self.assertEquals(2, project_summary['instance_quota'])
+        self.assertEquals(4, project_summary['core_quota'])
+        self.assertEquals('2014-02-17', project_summary['submit_date'])
+        self.assertEquals('2014-03-24 22:01:54', project_summary['modified_time'])
+        self.assertEquals(5, project_summary['cores'])
+        self.assertEquals(3, project_summary['instances'])
+        self.assertEquals('099901', project_summary['field_of_research_1'])
+        self.assertEquals(60, project_summary['for_percentage_1'])
+        self.assertEquals('070104', project_summary['field_of_research_2'])
+        self.assertEquals(40, project_summary['for_percentage_2'])
+        self.assertEquals(None, project_summary['field_of_research_3'])
+        self.assertEquals(0, project_summary['for_percentage_3'])
+        
+    def test_projects_from_allocation_request_id_with_multi_requests_with_privacy(self):       
+        AllocationRequest.showPrivateFields = False       
+        allocation_request_id = 1667
+        project_summary = AllocationRequest.project_from_allocation_request_id(allocation_request_id)
+
+        self.assertEquals('USQ eResearch Services Sandbox', project_summary['project_name'])
+        self.assertEquals('2014-02-17', project_summary['start_date'])
+        self.assertEquals('2014-05-17', project_summary['end_date'])
         self.assertFalse('use_case' in project_summary)
-        self.assertEquals('Many users and small data sets as well as small number of users and large data sets. This will vary depending on the tests and the resesearch group.', project_summary['usage_patterns'])
+        self.assertFalse('usage_patterns' in project_summary)
         self.assertEquals(2, project_summary['instance_quota'])
         self.assertEquals(4, project_summary['core_quota'])
         self.assertEquals('2014-02-17', project_summary['submit_date'])

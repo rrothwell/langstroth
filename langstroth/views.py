@@ -18,7 +18,7 @@ import json
 
 from langstroth import nagios
 
-LOG = logging.getLogger('custom.debug')
+LOG = logging.getLogger(__name__)
 
 GRAPHITE = settings.GRAPHITE_URL + "/render/"
 
@@ -204,3 +204,4 @@ def total_cores_per_domain(request):
     cleaned = cleaned.values()
     cleaned.sort(key=itemgetter('value'))
     return HttpResponse(dumps(cleaned), req.headers['content-type'])
+   
