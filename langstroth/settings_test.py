@@ -1,3 +1,5 @@
+# Settings file to support automated testing.
+
 # Django test settings for langstroth project.
 from os import path
 from os import environ
@@ -7,10 +9,10 @@ from .defaults import *  # NOQA
 
 TEST_MODE = True
 
-# Either set these values as environment variables in the Eclipse IDE
-# Or have the install_uat.sh script sed them to the real passwords.
-DB_PASSWORD = environ['LANGSTROTH_DEV_DB_PASSWORD']
-NAGIOS_PASSWORD = environ['LANGSTROTH_DEV_NAGIOS_PASSWORD']
+# Set these values as environment variables in the Eclipse IDE.
+# Only needed for integration testing against a real database.
+#DB_PASSWORD = environ['LANGSTROTH_DEV_DB_PASSWORD']
+#NAGIOS_PASSWORD = environ['LANGSTROTH_DEV_NAGIOS_PASSWORD']
 
 DEFAULT_DATABASE_NAME = 'langstroth'
 ALLOCATION_DATABASE_NAME = 'nectar_allocations'
@@ -35,10 +37,10 @@ DATABASES = {
 DATABASE_ROUTERS = ['nectar_allocations.router_for_testing.TestRouter']   
 
 # Password strings populated by an edited version of the install_uat.sh script.
-NAGIOS_URL = "http://localhost:8000/static/avail.html"
 NAGIOS_AUTH = ("user", "password")
 AVAILABILITY_QUERY_TEMPLATE = ""
 STATUS_QUERY_TEMPLATE = ""
+NAGIOS_AVAILABILITY_URL = "http://localhost:8000/static/avail.html"
 NAGIOS_STATUS_URL = "http://localhost:8000/static/status.html"
 
 GRAPHITE_URL = "http://graphite.dev.rc.nectar.org.au"
@@ -63,6 +65,7 @@ INSTALLED_APPS = (
     'langstroth',
     'nectar_status',
     'nectar_allocations',
+    'user_statistics',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
