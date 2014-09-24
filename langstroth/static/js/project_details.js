@@ -5,8 +5,6 @@
 var headings = {
 	"start_date" : "Start date",
 	"end_date" : "End date",
-//	"use_case" : " Use case",
-//	"usage_patterns" : "Usage patterns",
 	"instance_quota" : "Instance quota",
 	"core_quota" : "Core quota",
 	"for_distribution" : "FOR distribution",

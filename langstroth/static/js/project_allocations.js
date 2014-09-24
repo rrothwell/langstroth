@@ -7,8 +7,6 @@ var headings = {
 	"project_name" : "Project name",
 	"start_date" : "Start date",
 	"end_date" : "End date",
-//	"use_case" : " Use case",
-//	"usage_patterns" : "Usage patterns",
 	"instance_quota" : "Instance quota",
 	"core_quota" : "Core quota",
 	"submit_date" : "Submit date"
@@ -27,9 +25,7 @@ function projectDetails(elementId) {
 							.attr("class", "table-striped table-bordered table-condensed")
 							.style("margin-bottom", "20px");
 			
-//			var caption = table.append("caption")
-//							.text("Allocation: " + allocationIndex); 
-			var thead = table.append("thead"); // Not used.			
+			var thead = table.append("thead"); 		
 			var tbody = table.append("tbody");
 			
 			var rows = tbody.selectAll("tr")
