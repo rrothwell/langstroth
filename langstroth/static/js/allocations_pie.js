@@ -397,7 +397,7 @@ var totalText = statisticsArea.append("text")
       coreQuota: data.coreQuota.toFixed(0),
       instanceQuota: data.instanceQuota.toFixed(0)
     };
-		var rendered = Mustache.render(projectMarkup, view);
+	var rendered = Mustache.render(projectMarkup, view);
     toolTip.html(rendered);
   }
 
@@ -422,7 +422,7 @@ var totalText = statisticsArea.append("text")
       forCode: forCode,
       forName: forTitleMap[forCode].toLowerCase()
     };
-		var rendered = Mustache.render(forMarkup, view);
+	var rendered = Mustache.render(forMarkup, view);
     toolTip.html(rendered);
   }
 
