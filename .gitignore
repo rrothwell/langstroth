@@ -40,20 +40,19 @@ Thumbs.db
 # Project #
 ######################
 lxml.output
-user_statistics/private_data/*
-user_statistics/private_data/ga_local_application 
-user_statistics/private_data/ga_server_application
-# nectar_allocations/fixtures/allocation_requests.json
+private_data/*
 nectar_allocations/fixtures/nectar_allocations_dump_all.json
 langstroth/data/allocation_tree.json
-#logs/*
+logs/*
 langstroth/settings.py
 .project
 .pydevproject
 .settings
+.settings/*
 install_uat.sh
 langstroth/data
 langstroth/settings_uat.py
 langstroth/settings_dev.py
 langstroth/nagios_uat.py
-
+langstroth/data
+langstroth/data/*
