@@ -23,7 +23,7 @@ ALLOCATION_DATABASE_NAME = 'allocations'
 if CURRENT_ENVIRONMENT == DEV_ENVIRONMENT:
     DEFAULT_DATABASE_NAME = 'langstroth'
     ALLOCATION_DATABASE_NAME = 'nectar_allocations'
-    
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -37,49 +37,49 @@ if TEST_MODE:
     DATABASES = {
         # See: https://docs.djangoproject.com/en/1.6/intro/tutorial01/
         'default': {
-                'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-                'NAME': path.join(path.dirname(__file__), DEFAULT_DATABASE_NAME),                      # Or path to database file if using sqlite3.
+                'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+                'NAME': path.join(path.dirname(__file__), DEFAULT_DATABASE_NAME),  # Or path to database file if using sqlite3.
                 'TEST_NAME': path.join(path.dirname(__file__), DEFAULT_DATABASE_NAME),
             },
         # See: https://docs.djangoproject.com/en/1.6/topics/db/multi-db/
         'allocations_db': {
-                'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-                'NAME': path.join(path.dirname(__file__), ALLOCATION_DATABASE_NAME),                      # Or path to database file if using sqlite3.
+                'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+                'NAME': path.join(path.dirname(__file__), ALLOCATION_DATABASE_NAME),  # Or path to database file if using sqlite3.
                 'TEST_NAME': path.join(path.dirname(__file__), ALLOCATION_DATABASE_NAME),
         }
-    }   
-    DATABASE_ROUTERS = ['nectar_allocations.router_for_testing.TestRouter']   
+    }
+    DATABASE_ROUTERS = ['nectar_allocations.router_for_testing.TestRouter']
 else:
     DATABASES = {
          # See: https://docs.djangoproject.com/en/1.6/intro/tutorial01/
         'default': {
-            'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME': DEFAULT_DATABASE_NAME,                      # Or path to database file if using sqlite3.
+            'ENGINE': 'django.db.backends.mysql',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+            'NAME': DEFAULT_DATABASE_NAME,  # Or path to database file if using sqlite3.
             # The following settings are not used with sqlite3:
-            'USER': 'langstroth_user', # over-rides what is in my.cnf [client]
-            'PASSWORD': DB_PASSWORD, # over-rides what is in my.cnf [client]
-            'HOST': '',             # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-            'PORT': '',                      # Set to empty string for default.
+            'USER': 'langstroth_user',  # over-rides what is in my.cnf [client]
+            'PASSWORD': DB_PASSWORD,  # over-rides what is in my.cnf [client]
+            'HOST': '',  # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+            'PORT': '',  # Set to empty string for default.
             'OPTIONS': {
                 'read_default_file': '/private/etc/my.cnf',
-                'init_command': 'SET storage_engine=INNODB',    # Disable after the tables are created.
+                'init_command': 'SET storage_engine=INNODB',  # Disable after the tables are created.
             },
         },
          # See: https://docs.djangoproject.com/en/1.6/topics/db/multi-db/
         'allocations_db': {
-            'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME': ALLOCATION_DATABASE_NAME,                      # Or path to database file if using sqlite3.
+            'ENGINE': 'django.db.backends.mysql',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+            'NAME': ALLOCATION_DATABASE_NAME,  # Or path to database file if using sqlite3.
             # The following settings are not used with sqlite3:
-            'USER': 'langstroth_user', # over-rides what is in my.cnf [client]
-            'PASSWORD': DB_PASSWORD, # over-rides what is in my.cnf [client]
-            'HOST': '',             # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-            'PORT': '',                      # Set to empty string for default.
+            'USER': 'langstroth_user',  # over-rides what is in my.cnf [client]
+            'PASSWORD': DB_PASSWORD,  # over-rides what is in my.cnf [client]
+            'HOST': '',  # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+            'PORT': '',  # Set to empty string for default.
             'OPTIONS': {
                 'read_default_file': '/private/etc/my.cnf',
-                'init_command': 'SET storage_engine=INNODB',    # Disable after the tables are created.
+                'init_command': 'SET storage_engine=INNODB',  # Disable after the tables are created.
             },
         }
-    }   
+    }
     DATABASE_ROUTERS = ['nectar_allocations.router.AllocationsRouter']
 
 # Password strings populated by an edited version of the install_uat.sh script.
@@ -92,15 +92,15 @@ if CURRENT_ENVIRONMENT == DEV_ENVIRONMENT:
     import nagios_uat
 elif CURRENT_ENVIRONMENT == UAT_ENVIRONMENT:
     NAGIOS_URL = "http://langstroth.doesntexist.com/static/avail.html"
-    NAGIOS_AUTH = ("nectar", NAGIOS_PASSWORD)    # set password via sudo htpasswd /usr/local/nectar/.htpasswd nectar
+    NAGIOS_AUTH = ("nectar", NAGIOS_PASSWORD)  # set password via sudo htpasswd /usr/local/nectar/.htpasswd nectar
     GRAPHITE_URL = "http://graphite.dev.rc.nectar.org.au"
     NAGIOS_AVAILABILITY_URL = NAGIOS_URL
     NAGIOS_STATUS_URL = "http://langstroth.doesntexist.com/static/status.html"
     import nagios_uat
 elif CURRENT_ENVIRONMENT == PROD_ENVIRONMENT:
-    NAGIOS_URL = "http://nagios.test/cgi-bin/nagios3/" # Dummy service. Replace in production.
-    NAGIOS_AUTH = ("sam", NAGIOS_PASSWORD) # Dummy password. Replace in production.
-    GRAPHITE_URL = "http://graphite.mgmt.melbourne.rc.nectar.org.au" # Dummy service. Replace in production.
+    NAGIOS_URL = "http://nagios.test/cgi-bin/nagios3/"  # Dummy service. Replace in production.
+    NAGIOS_AUTH = ("sam", NAGIOS_PASSWORD)  # Dummy password. Replace in production.
+    GRAPHITE_URL = "http://graphite.mgmt.melbourne.rc.nectar.org.au"  # Dummy service. Replace in production.
 
 NAGIOS_SERVICE_GROUP = 'f5-endpoints'
 
@@ -234,7 +234,7 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 # more details on how to customize your logging configuration.
 
 print path.join(path.dirname(__file__), "../logs/debug.log")
-                
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -265,10 +265,10 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG',
             'propagate': True,
-        },    
+        },
     }
 }
 
 LOG = logging.getLogger('custom.debug')
-#LOG.debug("Database password: " + DB_PASSWORD)
-#LOG.debug("Nagios password: " + NAGIOS_PASSWORD)
+# LOG.debug("Database password: " + DB_PASSWORD)
+# LOG.debug("Nagios password: " + NAGIOS_PASSWORD)

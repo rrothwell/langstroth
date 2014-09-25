@@ -56,7 +56,7 @@ def index(request):
     context = {"title": "National Endpoint Status",
                "tagline": "",
                "report_range": "%s to Now" % then.strftime('%d, %b %Y')}
-    
+
     context['average'] = availability['average']
     for host in status['hosts'].values():
         for service in host['services']:

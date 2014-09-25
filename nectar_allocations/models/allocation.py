@@ -5,7 +5,7 @@ import re
 from nectar_allocations.switch import Switch
 
 class AllocationRequest(models.Model):
-    
+
     showPrivateFields = False
 
     STATUS_CHOICES = (
@@ -59,12 +59,12 @@ class AllocationRequest(models.Model):
     volume_quota = models.IntegerField(db_column="volume_quota", null=False, default=0)
     approver_email = models.CharField(max_length=75, db_column="approver_email", null=True)
     modified_time = models.DateTimeField(db_column="modified_time", null=False)
-    
+
     parent_request = models.ForeignKey('self', db_column="parent_request_id", null=True)
-    
+
     def __unicode__(self):
         return self.project_name + '(' + self.id + ')'
-    
+
     class Meta:
         ordering = ["project_name"]
         app_label = 'nectar_allocations'
@@ -80,7 +80,7 @@ class AllocationRequest(models.Model):
             or email_domain.startswith('ems.') \
             or email_domain.startswith('exchange.') \
             or email_domain.startswith('groupwise.'):
-            group, delimiter, domain = email_domain.partition('.')       
+            group, delimiter, domain = email_domain.partition('.')
         for case in Switch(domain):
             if case('griffithuni.edu.au'):
                 return 'griffith.edu.au'
@@ -92,45 +92,45 @@ class AllocationRequest(models.Model):
                 return 'sydney.edu.au'
             if case('myune.edu.au'):
                 return 'une.edu.au'
-            #if case(): # default, could also just omit condition or 'if True'
+            # if case(): # default, could also just omit condition or 'if True'
                 # Do nothing to the domain
             return domain
-        
+
     @staticmethod
     def extract_email_domain(email_address):
-        name, delimiter, domain = email_address.partition('@')       
+        name, delimiter, domain = email_address.partition('@')
         return domain
-    
-    # Find the list of allocations that have been approved, 
+
+    # Find the list of allocations that have been approved,
     # group them by name,
     # but then return just the latest in each allocation group.
     # The data needs some cleanup as there are some allocations with very similar names.
     @staticmethod
     def find_active_allocations():
-        all_approved_allocations = AllocationRequest.objects.filter(Q(status ='A') | Q(status ='X')).order_by('-modified_time')
+        all_approved_allocations = AllocationRequest.objects.filter(Q(status='A') | Q(status='X')).order_by('-modified_time')
         seen = set()
         keep = []
         for allocation in all_approved_allocations:
             if allocation.project_name not in seen:
                 keep.append(allocation)
                 seen.add(allocation.project_name)
-        return keep      
-    
+        return keep
+
     @staticmethod
     def is_valid_for_code(potential_for_code):
         return potential_for_code is not None
-    
+
     @staticmethod
     def apply_for_code_to_summary(allocation_summary, code):
         allocation_summary['for_2'] = code[:2]
         allocation_summary['for_4'] = code[:4]
         allocation_summary['for_6'] = code[:6]
-        
+
     def apply_partitioned_quotas(self, allocation_summary, percentage):
-        fraction =  float(percentage) / 100.0
+        fraction = float(percentage) / 100.0
         allocation_summary['instance_quota'] = self.instance_quota * fraction
         allocation_summary['core_quota'] = self.core_quota * fraction
-    
+
     def summary(self, code):
         allocation_summary = dict()
         allocation_summary['id'] = self.id
@@ -150,32 +150,32 @@ class AllocationRequest(models.Model):
         elif code == self.field_of_research_3:
             self.apply_partitioned_quotas(allocation_summary, self.for_percentage_3)
         return allocation_summary
-    
+
     @staticmethod
-    def institution_from_email(contact_email): 
+    def institution_from_email(contact_email):
         email_domain = AllocationRequest.extract_email_domain(contact_email)
         domain = AllocationRequest.strip_email_group(email_domain)
         return domain;
-   
+
     # See: http://www.regular-expressions.info/email.html
     # Ignore case as only [A-Z] character class is specified.
     EMAIL_ADDRESS_REGEX = re.compile(r'\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b', re.IGNORECASE)
     REPLACEMENT = r'[XXXX]'
-    
+
     @staticmethod
     def redact_all_emails(description):
         redacted_description = AllocationRequest.EMAIL_ADDRESS_REGEX.sub(AllocationRequest.REPLACEMENT, description)
-        return redacted_description;   
-    
+        return redacted_description;
+
     @staticmethod
     def apply_privacy_policy(description):
         redacted_description = AllocationRequest.redact_all_emails(description)
-        return redacted_description;   
+        return redacted_description;
 
     @staticmethod
-    def partition_active_allocations(): 
+    def partition_active_allocations():
         allocation_summaries = list()
-        active_allocations = AllocationRequest.find_active_allocations()  
+        active_allocations = AllocationRequest.find_active_allocations()
         for active_allocation in active_allocations:
             code = active_allocation.field_of_research_1
             if AllocationRequest.is_valid_for_code(code):
@@ -187,12 +187,12 @@ class AllocationRequest(models.Model):
             if AllocationRequest.is_valid_for_code(code):
                 allocation_summaries.append(active_allocation.summary(code))
         return allocation_summaries
-    
+
     @staticmethod
     def organise_allocations_tree():
         allocations = AllocationRequest.partition_active_allocations()
         allocations_tree = dict()
-         
+
         for allocation in allocations:
             allocation_code_2 = allocation['for_2']
             if not allocation_code_2 in allocations_tree:
@@ -216,7 +216,7 @@ class AllocationRequest(models.Model):
             twig['instanceQuota'] = allocation['instance_quota']
             twig['coreQuota'] = allocation['core_quota']
             branch_minor[allocation_code_6].append(twig)
-             
+
         return allocations_tree
 
     @staticmethod
@@ -225,22 +225,22 @@ class AllocationRequest(models.Model):
         restructured_tree = dict()
         restructured_tree['name'] = 'allocations'
         restructured_tree['children'] = list()
-        
+
         for code2 in allocations_tree.keys():
             named_children_2 = dict()
             named_children_2['name'] = code2
             named_children_2['children'] = list()
-            restructured_tree['children'].append(named_children_2)            
+            restructured_tree['children'].append(named_children_2)
             for code4 in allocations_tree[code2].keys():
                 named_children_4 = dict()
                 named_children_4['name'] = code4
-                named_children_4['children'] = list()            
-                named_children_2['children'].append(named_children_4)            
-                for code6 in allocations_tree[code2][code4].keys(): 
+                named_children_4['children'] = list()
+                named_children_2['children'].append(named_children_4)
+                for code6 in allocations_tree[code2][code4].keys():
                     named_children_6 = dict()
                     named_children_6['name'] = code6
-                    named_children_6['children'] = list()            
-                    named_children_4['children'].append(named_children_6)            
+                    named_children_6['children'] = list()
+                    named_children_4['children'].append(named_children_6)
                     allocation_summaries = allocations_tree[code2][code4][code6]
                     for allocation_summary in allocation_summaries:
                         allocation_items = dict()
@@ -253,18 +253,18 @@ class AllocationRequest(models.Model):
                             allocation_items['usagePatterns'] = allocation_summary['usagePatterns']
                         allocation_items['instanceQuota'] = allocation_summary['instanceQuota']
                         allocation_items['coreQuota'] = allocation_summary['coreQuota']
-                        named_children_6['children'].append(allocation_items)            
+                        named_children_6['children'].append(allocation_items)
         return restructured_tree
 
     @staticmethod
     def project_allocations_from_allocation_request_id(allocation_request_id):
-        base_request = AllocationRequest.objects.get(pk=allocation_request_id)      
+        base_request = AllocationRequest.objects.get(pk=allocation_request_id)
         project_summary = list()
         project_record = AllocationRequest.__project_summary_record(base_request)
         project_summary.append(project_record)
         other_requests = AllocationRequest.objects \
-            .filter(project_name = base_request.project_name) \
-            .exclude(id = allocation_request_id)
+            .filter(project_name=base_request.project_name) \
+            .exclude(id=allocation_request_id)
         for other_request in other_requests:
             project_record = AllocationRequest.__project_summary_record(other_request)
             project_summary.append(project_record)
@@ -276,7 +276,7 @@ class AllocationRequest(models.Model):
         allocations = AllocationRequest.project_allocations_from_allocation_request_id(allocation_request_id)
         project_summary = allocations[-1]
         return project_summary
-    
+
     @staticmethod
     def __project_summary_record(allocation_request):
         project_record = dict()

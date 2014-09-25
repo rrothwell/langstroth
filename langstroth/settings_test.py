@@ -14,25 +14,25 @@ NAGIOS_PASSWORD = environ['LANGSTROTH_DEV_NAGIOS_PASSWORD']
 
 DEFAULT_DATABASE_NAME = 'langstroth'
 ALLOCATION_DATABASE_NAME = 'nectar_allocations'
-    
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 DATABASES = {
     # See: https://docs.djangoproject.com/en/1.6/intro/tutorial01/
     'default': {
-            'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME': path.join(path.dirname(__file__), DEFAULT_DATABASE_NAME),                      # Or path to database file if using sqlite3.
+            'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+            'NAME': path.join(path.dirname(__file__), DEFAULT_DATABASE_NAME),  # Or path to database file if using sqlite3.
             'TEST_NAME': path.join(path.dirname(__file__), DEFAULT_DATABASE_NAME),
         },
     # See: https://docs.djangoproject.com/en/1.6/topics/db/multi-db/
     'allocations_db': {
-            'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME': path.join(path.dirname(__file__), ALLOCATION_DATABASE_NAME),                      # Or path to database file if using sqlite3.
+            'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+            'NAME': path.join(path.dirname(__file__), ALLOCATION_DATABASE_NAME),  # Or path to database file if using sqlite3.
             'TEST_NAME': path.join(path.dirname(__file__), ALLOCATION_DATABASE_NAME),
     }
-}   
-DATABASE_ROUTERS = ['nectar_allocations.router_for_testing.TestRouter']   
+}
+DATABASE_ROUTERS = ['nectar_allocations.router_for_testing.TestRouter']
 
 # Password strings populated by an edited version of the install_uat.sh script.
 NAGIOS_URL = "http://localhost:8000/static/avail.html"
@@ -99,6 +99,6 @@ LOGGING = {
             'handlers': ['file'],
             'level': 'DEBUG',
             'propagate': True,
-        },    
+        },
     }
 }

@@ -52,4 +52,4 @@ def project_allocations(request, allocation_request_id):
     allocation_list = AllocationRequest.project_allocations_from_allocation_request_id(allocation_request_id)
     json_string = dumps(allocation_list)
     return HttpResponse(json_string, "application/json")
-   
+

@@ -4,7 +4,7 @@ Created on 09/07/2014
 @author: nmb10
 See: https://djangosnippets.org/snippets/2247/
 '''
-          
+
 TYPE = 'type'
 PATH = 'path'
 VALUE = 'value'
@@ -16,7 +16,7 @@ class Diff(object):
 
         if vice_versa:
             self.check(second, first, with_values=with_values)
-        
+
     def check(self, first, second, path='', with_values=False):
         if second != None:
             if not isinstance(first, type(second)):
@@ -45,9 +45,9 @@ class Diff(object):
                     self.check(first[key], sec, path=new_path, with_values=with_values)
                 else:
                     # second is not dict. every key from first goes to the difference
-                    self.save_diff(new_path, PATH)                
+                    self.save_diff(new_path, PATH)
                     self.check(first[key], second, path=new_path, with_values=with_values)
-                
+
         # if object is list, loop over it and check.
         elif isinstance(first, list):
             for (index_page, item) in enumerate(first):
@@ -69,10 +69,9 @@ class Diff(object):
             if with_values and second != None:
                 if first != second:
                     self.save_diff('%s - %s | %s' % (path, first, second), VALUE)
-            return 
-            
+            return
+
     def save_diff(self, diff_message, type_):
         message = '%s: %s' % (type_, diff_message)
         if diff_message not in self.difference:
             self.difference.append(message)
-        
