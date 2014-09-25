@@ -26,12 +26,12 @@ def registrations_history(request):
     return HttpResponse(json_string, "application/json")
 
 def registrations_frequency(request):
-    #registration_frequency = UserRegistration.frequency()
+    # registration_frequency = UserRegistration.frequency()
     registration_frequency = UserRegistration.monthly_frequency()
     # Convert all dates to string dates.
     registrations = [{'date': UserRegistration.last_date_of_month(item['date']).strftime('%Y-%m-%d'), 'count': item['count']} for item in registration_frequency]
-    #registration_frequency = GoogleAnalytics.frequency()
+    # registration_frequency = GoogleAnalytics.frequency()
     json_string = dumps(registrations)
     LOG.debug("Registration frequency REST response: " + json_string)
     return HttpResponse(json_string, "application/json")
-   
+

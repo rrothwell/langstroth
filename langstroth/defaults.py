@@ -16,23 +16,23 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '',                      # Or path to database file if using sqlite3.
+        'ENGINE': 'django.db.backends.',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': '',  # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
         'USER': '',
         'PASSWORD': '',
-        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '',                      # Set to empty string for default.
+        'HOST': '',  # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'PORT': '',  # Set to empty string for default.
     }
 }
 
 NAGIOS_URL = "http://nagios.test/cgi-bin/nagios3/"
 AVAILABILITY_QUERY_TEMPLATE = "avail.cgi?t1=%s&t2=%s&show_log_entries=&servicegroup=%s&assumeinitialstates=yes&assumestateretention=yes&assumestatesduringnotrunning=yes&includesoftstates=yes&initialassumedhoststate=3&initialassumedservicestate=6&timeperiod=[+Current+time+range+]&backtrack=4"
 STATUS_QUERY_TEMPLATE = "status.cgi?servicegroup=%s&style=detail"
-NAGIOS_AUTH = ("sam", NAGIOS_PASSWORD) # Dummy password. Replace in production.
+NAGIOS_AUTH = ("sam", NAGIOS_PASSWORD)  # Dummy password. Replace in production.
 NAGIOS_SERVICE_GROUP = 'f5-endpoints'
 
-GRAPHITE_URL = "http://graphite.mgmt.melbourne.rc.nectar.org.au" # Dummy service. Replace in production.
+GRAPHITE_URL = "http://graphite.mgmt.melbourne.rc.nectar.org.au"  # Dummy service. Replace in production.
 
 
 
