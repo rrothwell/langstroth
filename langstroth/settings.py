@@ -17,6 +17,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Langstroth  If not, see <http://www.gnu.org/licenses/>.
 
+import os
+import logging
 from .defaults import *  # NOQA
 
-exec(open("/etc/langstroth/settings.py", "rb").read())
+# Fixes "No handlers could be found for logger"
+logging.basicConfig()
+
+LOG = logging.getLogger(__name__)
+
+CUSTOM_SETTINGS_PATH = "/etc/langstroth/settings.py"
+if os.path.exists(CUSTOM_SETTINGS_PATH):
+    exec(open(CUSTOM_SETTINGS_PATH, "rb").read())
+else:
+    message = "Missing custom settings file: %s" % CUSTOM_SETTINGS_PATH
+    LOG.warn(message)
