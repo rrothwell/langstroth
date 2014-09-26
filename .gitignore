@@ -50,7 +50,6 @@ langstroth/settings.py
 .settings
 .settings/*
 install_uat.sh
-langstroth/data
 langstroth/settings_uat.py
 langstroth/settings_dev.py
 langstroth/nagios_uat.py

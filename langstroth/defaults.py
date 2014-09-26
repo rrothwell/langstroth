@@ -1,8 +1,11 @@
 # Django settings for langstroth project.
 from os import path
+import sys
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+
+TEST_MODE = False
 
 DB_PASSWORD = ""
 NAGIOS_PASSWORD = ""
@@ -163,6 +166,11 @@ SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse'
@@ -173,13 +181,23 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        'console':{
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+            'stream': sys.stderr,
+        },
     },
     'loggers': {
         'django.request': {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
             'propagate': True,
+        },
+        '': {
+            'handlers': ['console'],
+            'level': 'WARN',
         },
     }
 }
