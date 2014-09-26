@@ -188,6 +188,11 @@ LOGGING = {
             'formatter': 'simple',
             'stream': sys.stderr,
         },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/langstroth',
+        },
     },
     'loggers': {
         'django.request': {
