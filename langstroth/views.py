@@ -1,20 +1,16 @@
-import calendar
 import datetime
 import requests
-import cssselect
-import lxml.etree
 from json import dumps
 from operator import itemgetter
 from urllib import urlencode
 from collections import defaultdict
 from dateutil.relativedelta import relativedelta
+import logging
+
 from django.http import HttpResponse
 from django.conf import settings
 from django.shortcuts import render
 from django.core.cache import cache
-import logging
-import json
-
 
 from langstroth import nagios
 
@@ -43,7 +39,7 @@ def index(request):
     except:
         availability = cache.get('nagios_availability')
 
-    LOG.debug("Availability: " + json.dumps(availability))
+    LOG.debug("Availability: " + str(availability))
 
     try:
         status = nagios.get_status()
@@ -51,19 +47,27 @@ def index(request):
     except:
         status = cache.get('nagios_status')
 
-    LOG.debug("Status: " + json.dumps(status))
+    LOG.debug("Status: " + str(status))
 
     context = {"title": "National Endpoint Status",
                "tagline": "",
                "report_range": "%s to Now" % then.strftime('%d, %b %Y')}
 
-    context['average'] = availability['average']
-    for host in status['hosts'].values():
-        for service in host['services']:
-            service['availability'] = availability['services'][service['name']]
+    if availability:
+        context['average'] = availability['average']
+        for host in status['hosts'].values():
+            for service in host['services']:
+                service['availability'] = \
+                    availability['services'][service['name']]
 
-    context['hosts'] = sorted(status['hosts'].values(),
-                              key=itemgetter('hostname'))
+    if status:
+        context['hosts'] = sorted(status['hosts'].values(),
+                                  key=itemgetter('hostname'))
+    else:
+        context['hosts'] = []
+
+    if not status or not availability:
+        return render(request, "index.html", context, status=500)
     return render(request, "index.html", context)
 
 

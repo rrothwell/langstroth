@@ -2,11 +2,13 @@ from django.db import models
 from django.conf import settings
 from django.db.models import Q
 import re
-from nectar_allocations.switch import Switch
+from operator import itemgetter
+from django.utils import timezone
+
 
 class AllocationRequest(models.Model):
 
-    showPrivateFields = False
+    show_private_fields = False
 
     STATUS_CHOICES = (
         ('N', 'N'),
@@ -58,7 +60,7 @@ class AllocationRequest(models.Model):
     object_storage_zone = models.CharField(max_length=64, db_column="object_storage_zone", null=True)
     volume_quota = models.IntegerField(db_column="volume_quota", null=False, default=0)
     approver_email = models.CharField(max_length=75, db_column="approver_email", null=True)
-    modified_time = models.DateTimeField(db_column="modified_time", null=False)
+    modified_time = models.DateTimeField(default=timezone.now, db_column="modified_time", null=False)
 
     parent_request = models.ForeignKey('self', db_column="parent_request_id", null=True)
 
@@ -73,41 +75,39 @@ class AllocationRequest(models.Model):
 
     # Refer to query for view view_institution_clean (Alan).
     @staticmethod
-    def strip_email_group(email_domain):
-        domain = email_domain
-        if email_domain.startswith('student') \
-            or email_domain.startswith('my.') \
-            or email_domain.startswith('ems.') \
-            or email_domain.startswith('exchange.') \
-            or email_domain.startswith('groupwise.'):
-            group, delimiter, domain = email_domain.partition('.')
-        for case in Switch(domain):
-            if case('griffithuni.edu.au'):
-                return 'griffith.edu.au'
-            if case('waimr.uwa.edu.au'):
-                return 'uwa.edu.au'
-            if case('uni.sydney.edu.au'):
-                return 'sydney.edu.au'
-            if case('usyd.edu.au'):
-                return 'sydney.edu.au'
-            if case('myune.edu.au'):
-                return 'une.edu.au'
-            # if case(): # default, could also just omit condition or 'if True'
-                # Do nothing to the domain
-            return domain
+    def strip_email_sub_domains(domain):
+        prefix = domain.split('.', 1)[0]
+        if prefix in ('my', 'ems', 'exchange', 'groupwise', 'student', 'students', 'studentmail'):
+            _, _, domain = domain.partition('.')
+        if domain == 'griffithuni.edu.au':
+            return 'griffith.edu.au'
+        if domain == 'waimr.uwa.edu.au':
+            return 'uwa.edu.au'
+        if domain == 'uni.sydney.edu.au':
+            return 'sydney.edu.au'
+        if domain == 'usyd.edu.au':
+            return 'sydney.edu.au'
+        if domain == 'myune.edu.au':
+            return 'une.edu.au'
+        return domain
 
     @staticmethod
     def extract_email_domain(email_address):
-        name, delimiter, domain = email_address.partition('@')
+        _, _, domain = email_address.partition('@')
         return domain
 
-    # Find the list of allocations that have been approved,
-    # group them by name,
-    # but then return just the latest in each allocation group.
-    # The data needs some cleanup as there are some allocations with very similar names.
-    @staticmethod
-    def find_active_allocations():
-        all_approved_allocations = AllocationRequest.objects.filter(Q(status='A') | Q(status='X')).order_by('-modified_time')
+    @classmethod
+    def find_active_allocations(cls):
+        """Find the list of approved allocations.
+
+        Find all, group them by name,
+        but then return just the latest in each allocation group.
+        The data needs some cleanup as there are some allocations with very similar names.
+        """
+        all_approved_allocations = cls \
+            .objects.filter(Q(status='A') | Q(status='X')) \
+            .exclude(field_of_research_1=None, field_of_research_2=None, field_of_research_3=None) \
+            .order_by('-modified_time')
         seen = set()
         keep = []
         for allocation in all_approved_allocations:
@@ -120,6 +120,9 @@ class AllocationRequest(models.Model):
     def is_valid_for_code(potential_for_code):
         return potential_for_code is not None
 
+    # the most fine-grained field-of-research code looks like 6 digits: '987654'
+    # the more general FOR codes for this field-of-research
+    # would be the leading  4 (= '9876') and 2 (= '98') digits.
     @staticmethod
     def apply_for_code_to_summary(allocation_summary, code):
         allocation_summary['for_2'] = code[:2]
@@ -134,15 +137,15 @@ class AllocationRequest(models.Model):
     def summary(self, code):
         allocation_summary = dict()
         allocation_summary['id'] = self.id
-        allocation_summary['institution'] = AllocationRequest.institution_from_email(self.contact_email)
+        allocation_summary['institution'] = self.institution_from_email(self.contact_email)
         allocation_summary['project_name'] = self.project_name
         # Redact any email addresses.
-        if AllocationRequest.showPrivateFields:
-            allocation_summary['usage_patterns'] = AllocationRequest.apply_privacy_policy(self.usage_patterns)
+        if self.show_private_fields:
+            allocation_summary['usage_patterns'] = self.apply_privacy_policy(self.usage_patterns)
         # Redact any email addresses.
-        if AllocationRequest.showPrivateFields:
-            allocation_summary['use_case'] = AllocationRequest.apply_privacy_policy(self.use_case)
-        AllocationRequest.apply_for_code_to_summary(allocation_summary, code)
+        if self.show_private_fields:
+            allocation_summary['use_case'] = self.apply_privacy_policy(self.use_case)
+        self.apply_for_code_to_summary(allocation_summary, code)
         if code == self.field_of_research_1:
             self.apply_partitioned_quotas(allocation_summary, self.for_percentage_1)
         elif code == self.field_of_research_2:
@@ -151,67 +154,67 @@ class AllocationRequest(models.Model):
             self.apply_partitioned_quotas(allocation_summary, self.for_percentage_3)
         return allocation_summary
 
-    @staticmethod
-    def institution_from_email(contact_email):
-        email_domain = AllocationRequest.extract_email_domain(contact_email)
-        domain = AllocationRequest.strip_email_group(email_domain)
-        return domain;
+    @classmethod
+    def institution_from_email(cls, contact_email):
+        email_domain = cls.extract_email_domain(contact_email)
+        domain = cls.strip_email_sub_domains(email_domain)
+        return domain
 
     # See: http://www.regular-expressions.info/email.html
     # Ignore case as only [A-Z] character class is specified.
     EMAIL_ADDRESS_REGEX = re.compile(r'\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b', re.IGNORECASE)
     REPLACEMENT = r'[XXXX]'
 
-    @staticmethod
-    def redact_all_emails(description):
-        redacted_description = AllocationRequest.EMAIL_ADDRESS_REGEX.sub(AllocationRequest.REPLACEMENT, description)
-        return redacted_description;
+    @classmethod
+    def redact_all_emails(cls, description):
+        redacted_description = cls.EMAIL_ADDRESS_REGEX.sub(cls.REPLACEMENT, description)
+        return redacted_description
 
-    @staticmethod
-    def apply_privacy_policy(description):
-        redacted_description = AllocationRequest.redact_all_emails(description)
-        return redacted_description;
+    @classmethod
+    def apply_privacy_policy(cls, description):
+        redacted_description = cls.redact_all_emails(description)
+        return redacted_description
 
-    @staticmethod
-    def partition_active_allocations():
+    @classmethod
+    def partition_active_allocations(cls):
         allocation_summaries = list()
-        active_allocations = AllocationRequest.find_active_allocations()
+        active_allocations = cls.find_active_allocations()
         for active_allocation in active_allocations:
             code = active_allocation.field_of_research_1
-            if AllocationRequest.is_valid_for_code(code):
+            if cls.is_valid_for_code(code):
                 allocation_summaries.append(active_allocation.summary(code))
             code = active_allocation.field_of_research_2
-            if AllocationRequest.is_valid_for_code(code):
+            if cls.is_valid_for_code(code):
                 allocation_summaries.append(active_allocation.summary(code))
             code = active_allocation.field_of_research_3
-            if AllocationRequest.is_valid_for_code(code):
+            if cls.is_valid_for_code(code):
                 allocation_summaries.append(active_allocation.summary(code))
         return allocation_summaries
 
-    @staticmethod
-    def organise_allocations_tree():
-        allocations = AllocationRequest.partition_active_allocations()
+    @classmethod
+    def organise_allocations_tree(cls):
+        allocations = cls.partition_active_allocations()
         allocations_tree = dict()
 
         for allocation in allocations:
             allocation_code_2 = allocation['for_2']
-            if not allocation_code_2 in allocations_tree:
+            if allocation_code_2 not in allocations_tree:
                 allocations_tree[allocation_code_2] = dict()
             branch_major = allocations_tree[allocation_code_2]
             allocation_code_4 = allocation['for_4']
-            if not allocation_code_4 in branch_major:
+            if allocation_code_4 not in branch_major:
                 branch_major[allocation_code_4] = dict()
             branch_minor = branch_major[allocation_code_4]
             allocation_code_6 = allocation['for_6']
-            if not allocation_code_6 in branch_minor:
+            if allocation_code_6 not in branch_minor:
                 branch_minor[allocation_code_6] = list()
             twig = dict()
             twig['id'] = allocation['id']
             twig['projectName'] = allocation['project_name']
             twig['institution'] = allocation['institution']
-            if AllocationRequest.showPrivateFields:
+            if cls.show_private_fields:
                 twig['useCase'] = allocation['use_case']
-            if AllocationRequest.showPrivateFields:
+            if cls.show_private_fields:
                 twig['usagePatterns'] = allocation['usage_patterns']
             twig['instanceQuota'] = allocation['instance_quota']
             twig['coreQuota'] = allocation['core_quota']
@@ -220,88 +223,92 @@ class AllocationRequest(models.Model):
         return allocations_tree
 
     @staticmethod
-    def restructure_allocations_tree():
-        allocations_tree = AllocationRequest.organise_allocations_tree();
-        restructured_tree = dict()
-        restructured_tree['name'] = 'allocations'
-        restructured_tree['children'] = list()
+    def create_allocation_tree_branch_node(name):
+        return {'name': name, 'children': []}
 
-        for code2 in allocations_tree.keys():
-            named_children_2 = dict()
-            named_children_2['name'] = code2
-            named_children_2['children'] = list()
-            restructured_tree['children'].append(named_children_2)
-            for code4 in allocations_tree[code2].keys():
-                named_children_4 = dict()
-                named_children_4['name'] = code4
-                named_children_4['children'] = list()
-                named_children_2['children'].append(named_children_4)
-                for code6 in allocations_tree[code2][code4].keys():
-                    named_children_6 = dict()
-                    named_children_6['name'] = code6
-                    named_children_6['children'] = list()
-                    named_children_4['children'].append(named_children_6)
-                    allocation_summaries = allocations_tree[code2][code4][code6]
-                    for allocation_summary in allocation_summaries:
-                        allocation_items = dict()
-                        allocation_items['id'] = allocation_summary['id']
-                        allocation_items['name'] = allocation_summary['projectName']
-                        allocation_items['institution'] = allocation_summary['institution']
-                        if AllocationRequest.showPrivateFields:
-                            allocation_items['useCase'] = allocation_summary['useCase']
-                        if AllocationRequest.showPrivateFields:
-                            allocation_items['usagePatterns'] = allocation_summary['usagePatterns']
-                        allocation_items['instanceQuota'] = allocation_summary['instanceQuota']
-                        allocation_items['coreQuota'] = allocation_summary['coreQuota']
-                        named_children_6['children'].append(allocation_items)
+    @classmethod
+    def create_allocation_tree_leaf_node(cls, allocation_summary):
+        allocation_items = {
+            'id': allocation_summary['id'],
+            'name': allocation_summary['projectName'],
+            'institution': allocation_summary['institution'],
+            'instanceQuota': allocation_summary['instanceQuota'],
+            'coreQuota': allocation_summary['coreQuota']
+        }
+        if cls.show_private_fields:
+            allocation_items['useCase'] = allocation_summary['useCase']
+        if cls.show_private_fields:
+            allocation_items['usagePatterns'] = allocation_summary['usagePatterns']
+        return allocation_items
+
+    @classmethod
+    def restructure_allocations_tree(cls):
+        allocations_tree = cls.organise_allocations_tree()
+        restructured_tree = cls.create_allocation_tree_branch_node('allocations')
+        cls.traverse_allocations_tree(allocations_tree, restructured_tree, 0)
         return restructured_tree
 
-    @staticmethod
-    def project_allocations_from_allocation_request_id(allocation_request_id):
-        base_request = AllocationRequest.objects.get(pk=allocation_request_id)
+    @classmethod
+    def traverse_allocations_tree(cls, allocations_tree, node_parent, recursion_depth):
+        MAX_RECURSION_DEPTH = 2
+        for node_name in allocations_tree.keys():
+            node_children = cls.create_allocation_tree_branch_node(node_name)
+            node_parent['children'].append(node_children)
+            allocations_subtree = allocations_tree[node_name]
+            if recursion_depth < MAX_RECURSION_DEPTH:
+                cls.traverse_allocations_tree(allocations_subtree, node_children, recursion_depth + 1)
+            else:
+                for allocation_summary in allocations_subtree:
+                    allocation_items = cls.create_allocation_tree_leaf_node(allocation_summary)
+                    node_children['children'].append(allocation_items)
+
+    @classmethod
+    def project_allocations_from_allocation_request_id(cls, allocation_request_id):
+        base_request = cls.objects.get(pk=allocation_request_id)
         project_summary = list()
-        project_record = AllocationRequest.__project_summary_record(base_request)
+        project_record = cls.__project_summary_record(base_request)
         project_summary.append(project_record)
-        other_requests = AllocationRequest.objects \
+        other_requests = cls.objects \
             .filter(project_name=base_request.project_name) \
             .exclude(id=allocation_request_id)
         for other_request in other_requests:
-            project_record = AllocationRequest.__project_summary_record(other_request)
+            project_record = cls.__project_summary_record(other_request)
             project_summary.append(project_record)
-            project_summary.sort(key=lambda project_record: project_record['modified_time'])
+            project_summary.sort(key=itemgetter('modified_time'))
         return project_summary
 
-    @staticmethod
-    def project_from_allocation_request_id(allocation_request_id):
-        allocations = AllocationRequest.project_allocations_from_allocation_request_id(allocation_request_id)
+    @classmethod
+    def project_from_allocation_request_id(cls, allocation_request_id):
+        allocations = cls.project_allocations_from_allocation_request_id(allocation_request_id)
         project_summary = allocations[-1]
         return project_summary
 
-    @staticmethod
-    def __project_summary_record(allocation_request):
-        project_record = dict()
-        project_record['id'] = allocation_request.id
-        project_record['project_name'] = allocation_request.project_name
-        project_record['institution'] = AllocationRequest.institution_from_email(allocation_request.contact_email)
-        project_record['start_date'] = allocation_request.start_date.strftime('%Y-%m-%d')
-        project_record['end_date'] = allocation_request.end_date.strftime('%Y-%m-%d')
+    @classmethod
+    def __project_summary_record(cls, request):
+        project_record = {
+            'id': request.id,
+            'project_name': request.project_name,
+            'institution': cls.institution_from_email(request.contact_email),
+            'start_date': request.start_date.strftime('%Y-%m-%d'),
+            'end_date': request.end_date.strftime('%Y-%m-%d'),
+            'instance_quota': request.instance_quota,
+            'core_quota': request.core_quota,
+            'instances': request.instances,
+            'cores': request.cores,
+            'field_of_research_1': request.field_of_research_1,
+            'for_percentage_1': request.for_percentage_1,
+            'field_of_research_2': request.field_of_research_2,
+            'for_percentage_2': request.for_percentage_2,
+            'field_of_research_3': request.field_of_research_3,
+            'for_percentage_3': request.for_percentage_3,
+            'submit_date': request.submit_date.strftime('%Y-%m-%d'),
+            'modified_time': request.modified_time.strftime('%Y-%m-%d %H:%M:%S')
+        }
         # Redact any email addresses.
-        if AllocationRequest.showPrivateFields:
-            project_record['use_case'] = AllocationRequest.apply_privacy_policy(allocation_request.use_case)
+        if cls.show_private_fields:
+            project_record['use_case'] = cls.apply_privacy_policy(request.use_case)
         # Redact any email addresses.
-        if AllocationRequest.showPrivateFields:
-            project_record['usage_patterns'] = AllocationRequest.apply_privacy_policy(allocation_request.usage_patterns)
-        project_record['instance_quota'] = allocation_request.instance_quota
-        project_record['core_quota'] = allocation_request.core_quota
-        project_record['instances'] = allocation_request.instances
-        project_record['cores'] = allocation_request.cores
-        project_record['field_of_research_1'] = allocation_request.field_of_research_1
-        project_record['for_percentage_1'] = allocation_request.for_percentage_1
-        project_record['field_of_research_2'] = allocation_request.field_of_research_2
-        project_record['for_percentage_2'] = allocation_request.for_percentage_2
-        project_record['field_of_research_3'] = allocation_request.field_of_research_3
-        project_record['for_percentage_3'] = allocation_request.for_percentage_3
-        project_record['submit_date'] = allocation_request.submit_date.strftime('%Y-%m-%d')
-        project_record['modified_time'] = allocation_request.modified_time.strftime('%Y-%m-%d %H:%M:%S')
-        return project_record
+        if cls.show_private_fields:
+            project_record['usage_patterns'] = cls.apply_privacy_policy(request.usage_patterns)
 
+        return project_record

@@ -10,7 +10,7 @@ class TestRouter(object):
     def allow_relation(self, obj1, obj2, **hints):
         if obj1._meta.app_label == 'nectar_allocations' or \
             obj2._meta.app_label == 'nectar_allocations':
-            return True
+                return True
         return None
 
     def allow_syncdb(self, db, model):
@@ -19,4 +19,3 @@ class TestRouter(object):
         elif model._meta.app_label == 'nectar_allocations':
             return False
         return None
-

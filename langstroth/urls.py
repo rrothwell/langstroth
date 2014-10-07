@@ -7,7 +7,9 @@ from langstroth import error
 # from django.contrib import admin
 # admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = patterns(
+    '',
+
     # Examples:
     url(r'^$', 'langstroth.views.index', name='home'),
     # url(r'^langstroth/', include('langstroth.foo.urls')),
@@ -16,7 +18,7 @@ urlpatterns = patterns('',
     url(r'^domain/cores_per_domain$', 'langstroth.views.total_cores_per_domain', name='domain'),
     url(r'^growth/instance_count$', 'langstroth.views.total_instance_count'),
     url(r'^growth/used_cores$', 'langstroth.views.total_used_cores'),
-    url(r'^nacc/', include('nectar_allocations.urls')),
+    url(r'^allocations/', include('nectar_allocations.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),

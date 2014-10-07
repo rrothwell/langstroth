@@ -1,15 +1,18 @@
 # Django settings for langstroth project.
-from os import path
 import sys
+from utilities import file
+
+# Override this to TEST_MODE = False for the production settings file.
+# It's True here so we can populate the database with reference data.
+TEST_MODE = True
+
+DEFAULT_DATABASE_NAME = 'langstroth.db'
+ALLOCATION_DATABASE_NAME = 'nectar_allocations.db'
+
+NAGIOS_PASSWORD = ""
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-
-TEST_MODE = False
-
-DB_PASSWORD = ""
-NAGIOS_PASSWORD = ""
-
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -18,26 +21,47 @@ ADMINS = (
 MANAGERS = ADMINS
 
 DATABASES = {
+    # See: https://docs.djangoproject.com/en/1.6/intro/tutorial01/
     'default': {
-        'ENGINE': 'django.db.backends.',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '',  # Or path to database file if using sqlite3.
-        # The following settings are not used with sqlite3:
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',  # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '',  # Set to empty string for default.
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': file.absolute_path(DEFAULT_DATABASE_NAME),
+            'TEST_NAME': file.absolute_path(DEFAULT_DATABASE_NAME),
+        },
+    # See: https://docs.djangoproject.com/en/1.6/topics/db/multi-db/
+    'allocations_db': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': file.absolute_path(ALLOCATION_DATABASE_NAME),
+            'TEST_NAME': file.absolute_path(ALLOCATION_DATABASE_NAME),
     }
 }
+DATABASE_ROUTERS = ['nectar_allocations.router.AllocationsRouter']
+FIXTURE_DIRS = (
+    file.absolute_path('../nectar_allocations/reference_data/'),
+)
 
 NAGIOS_URL = "http://nagios.test/cgi-bin/nagios3/"
-AVAILABILITY_QUERY_TEMPLATE = "avail.cgi?t1=%s&t2=%s&show_log_entries=&servicegroup=%s&assumeinitialstates=yes&assumestateretention=yes&assumestatesduringnotrunning=yes&includesoftstates=yes&initialassumedhoststate=3&initialassumedservicestate=6&timeperiod=[+Current+time+range+]&backtrack=4"
-STATUS_QUERY_TEMPLATE = "status.cgi?servicegroup=%s&style=detail"
-NAGIOS_AUTH = ("sam", NAGIOS_PASSWORD)  # Dummy password. Replace in production.
+AVAILABILITY_QUERY_TEMPLATE = "avail.cgi" \
+    "?t1=%s" \
+    "&t2=%s" \
+    "&show_log_entries=" \
+    "&servicegroup=%s" \
+    "&assumeinitialstates=yes" \
+    "&assumestateretention=yes" \
+    "&assumestatesduringnotrunning=yes" \
+    "&includesoftstates=yes" \
+    "&initialassumedhoststate=3" \
+    "&initialassumedservicestate=6" \
+    "&timeperiod=[+Current+time+range+]" \
+    "&backtrack=4"
+STATUS_QUERY_TEMPLATE = "status.cgi" \
+    "?servicegroup=%s" \
+    "&style=detail"
+# Dummy password. Replace in production.
+NAGIOS_AUTH = ("sam", NAGIOS_PASSWORD)
 NAGIOS_SERVICE_GROUP = 'f5-endpoints'
 
-GRAPHITE_URL = "http://graphite.mgmt.melbourne.rc.nectar.org.au"  # Dummy service. Replace in production.
-
-
+# Dummy service. Replace in production.
+GRAPHITE_URL = "http://graphite.mgmt.melbourne.rc.nectar.org.au"
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -87,8 +111,9 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-    path.join(path.dirname(__file__), "static"),
-    # Put strings here, like "/home/html/static" or "C:/www/django/static".
+    file.absolute_path("static"),
+    # Put strings here, like "/home/html/static"
+    # or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
@@ -135,8 +160,9 @@ ROOT_URLCONF = 'langstroth.urls'
 WSGI_APPLICATION = 'langstroth.wsgi.application'
 
 TEMPLATE_DIRS = (
-    path.join(path.dirname(__file__), "templates"),
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+    file.absolute_path("templates"),
+    # Put strings here, like "/home/html/django_templates"
+    # or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
@@ -150,6 +176,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'langstroth',
     'nectar_status',
+    'nectar_allocations',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -188,11 +215,12 @@ LOGGING = {
             'formatter': 'simple',
             'stream': sys.stderr,
         },
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': '/var/log/langstroth',
-        },
+#         'file': {
+#             'level': 'DEBUG',
+#             'class': 'logging.FileHandler',
+#             Create the log directory with the correct permissions by hand.
+#             'filename': '/var/log/langstroth',
+#         },
     },
     'loggers': {
         'django.request': {

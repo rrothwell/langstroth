@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.test import TestCase
 
 from nectar_allocations.models.allocation import AllocationRequest
@@ -8,11 +10,11 @@ class AllocationDBTest(TestCase):
     multi_db = True
 
     def setUp(self):
-        self.savedShowPrivacy = AllocationRequest.showPrivateFields
+        self.savedShowPrivacy = AllocationRequest.show_private_fields
         return
 
     def tearDown(self):
-        AllocationRequest.showPrivateFields = self.savedShowPrivacy
+        AllocationRequest.show_private_fields = self.savedShowPrivacy
         return
 
     def test_fixtures(self):
@@ -33,6 +35,60 @@ class AllocationDBTest(TestCase):
         self.assertEqual(allocation1.instance_quota, 10)
 
     def test_find_active_allocations(self):
+        allocations = AllocationRequest.find_active_allocations()
+        self.assertEquals(2, len(allocations))
+
+    def test_find_active_allocations_including_new_requests(self):
+        request0 = AllocationRequest(project_name='Project0', status='A')
+        request0.field_of_research_1 = '11'
+        request0.field_of_research_2 = '22'
+        request0.field_of_research_3 = '33'
+        request0.save()
+        allocations = AllocationRequest.find_active_allocations()
+        self.assertEquals(3, len(allocations))
+
+    def test_find_active_allocations_including_third_null_fors(self):
+        request0 = AllocationRequest(project_name='Project0', status='A')
+        request0.field_of_research_1 = '11'
+        request0.field_of_research_2 = '22'
+        request0.field_of_research_3 = None
+        request0.save()
+        allocations = AllocationRequest.find_active_allocations()
+        self.assertEquals(3, len(allocations))
+
+    def test_find_active_allocations_including_2_null_fors(self):
+        request0 = AllocationRequest(project_name='Project0', status='A')
+        request0.field_of_research_1 = '11'
+        request0.field_of_research_2 = None
+        request0.field_of_research_3 = None
+        request0.save()
+        allocations = AllocationRequest.find_active_allocations()
+        self.assertEquals(3, len(allocations))
+
+    def test_find_active_allocations_excluding_first_null_fors(self):
+        request0 = AllocationRequest(project_name='Project0', status='A')
+        request0.field_of_research_1 = None
+        request0.field_of_research_2 = '22'
+        request0.field_of_research_3 = '33'
+        request0.save()
+        allocations = AllocationRequest.find_active_allocations()
+        self.assertEquals(3, len(allocations))
+
+    def test_find_active_allocations_excluding_second_null_fors(self):
+        request0 = AllocationRequest(project_name='Project0', status='A')
+        request0.field_of_research_1 = '11'
+        request0.field_of_research_2 = None
+        request0.field_of_research_3 = '33'
+        request0.save()
+        allocations = AllocationRequest.find_active_allocations()
+        self.assertEquals(3, len(allocations))
+
+    def test_find_active_allocations_excluding_3_null_fors(self):
+        request0 = AllocationRequest(project_name='Project0', status='A')
+        request0.field_of_research_1 = None
+        request0.field_of_research_2 = None
+        request0.field_of_research_3 = None
+        request0.save()
         allocations = AllocationRequest.find_active_allocations()
         self.assertEquals(2, len(allocations))
 
@@ -127,7 +183,7 @@ class AllocationDBTest(TestCase):
         self.assertEquals('USQ eResearch Services Sandbox', project_items['name'])
 
     def test_project_allocations_from_allocation_request_id(self):
-        AllocationRequest.showPrivateFields = True
+        AllocationRequest.show_private_fields = True
         allocation_request_id = 1654
         project_allocations = AllocationRequest.project_allocations_from_allocation_request_id(allocation_request_id)
 
@@ -140,7 +196,7 @@ class AllocationDBTest(TestCase):
         self.assertEquals('Data is stored on a remote server so no storage is needed. Please contact [XXXX].', project_allocations[0]['usage_patterns'])
 
     def test_project_allocations_from_allocation_request_id_with_privacy(self):
-        AllocationRequest.showPrivateFields = False
+        AllocationRequest.show_private_fields = False
         allocation_request_id = 1654
         project_allocations = AllocationRequest.project_allocations_from_allocation_request_id(allocation_request_id)
 
@@ -152,7 +208,7 @@ class AllocationDBTest(TestCase):
         self.assertFalse('usage_patterns' in project_allocations[0])
 
     def test_project_allocations_from_allocation_request_id_with_multi_requests(self):
-        AllocationRequest.showPrivateFields = True
+        AllocationRequest.show_private_fields = True
         allocation_request_id = 1667
         project_allocations = AllocationRequest.project_allocations_from_allocation_request_id(allocation_request_id)
         self.assertEquals(2, len(project_allocations))
@@ -172,7 +228,7 @@ class AllocationDBTest(TestCase):
         self.assertEquals('Many users and small data sets as well as small number of users and large data sets. This will vary depending on the tests and the resesearch group. Please contact [XXXX].', project_allocations[0]['usage_patterns'])
 
     def test_project_allocations_from_allocation_request_id_with_multi_requests_with_privacy(self):
-        AllocationRequest.showPrivateFields = False
+        AllocationRequest.show_private_fields = False
         allocation_request_id = 1667
         project_allocations = AllocationRequest.project_allocations_from_allocation_request_id(allocation_request_id)
         self.assertEquals(2, len(project_allocations))
@@ -189,7 +245,7 @@ class AllocationDBTest(TestCase):
         self.assertFalse('use_case' in project_allocations[1])
 
     def test_projects_from_allocation_request_id(self):
-        AllocationRequest.showPrivateFields = True
+        AllocationRequest.show_private_fields = True
         allocation_request_id = 1654
         project_summary = AllocationRequest.project_from_allocation_request_id(allocation_request_id)
 
@@ -213,7 +269,7 @@ class AllocationDBTest(TestCase):
         self.assertEquals(0, project_summary['for_percentage_3'])
 
     def test_projects_from_allocation_request_id_with_privacy(self):
-        AllocationRequest.showPrivateFields = False
+        AllocationRequest.show_private_fields = False
         allocation_request_id = 1654
         project_summary = AllocationRequest.project_from_allocation_request_id(allocation_request_id)
 
@@ -236,7 +292,7 @@ class AllocationDBTest(TestCase):
         self.assertEquals(0, project_summary['for_percentage_3'])
 
     def test_projects_from_allocation_request_id_with_multi_requests(self):
-        AllocationRequest.showPrivateFields = True
+        AllocationRequest.show_private_fields = True
         allocation_request_id = 1667
         project_summary = AllocationRequest.project_from_allocation_request_id(allocation_request_id)
 
@@ -260,7 +316,7 @@ class AllocationDBTest(TestCase):
         self.assertEquals(0, project_summary['for_percentage_3'])
 
     def test_projects_from_allocation_request_id_with_multi_requests_with_privacy(self):
-        AllocationRequest.showPrivateFields = False
+        AllocationRequest.show_private_fields = False
         allocation_request_id = 1667
         project_summary = AllocationRequest.project_from_allocation_request_id(allocation_request_id)
 
@@ -281,4 +337,3 @@ class AllocationDBTest(TestCase):
         self.assertEquals(40, project_summary['for_percentage_2'])
         self.assertEquals(None, project_summary['field_of_research_3'])
         self.assertEquals(0, project_summary['for_percentage_3'])
-
