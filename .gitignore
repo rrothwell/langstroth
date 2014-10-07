@@ -7,11 +7,7 @@
 *.o
 *.so
 *.pyc
-<<<<<<< HEAD
 
-=======
- 
->>>>>>> a77b28c
 # Packages #
 ############
 # it's better to unpack these files and commit the raw source
@@ -24,21 +20,13 @@
 *.rar
 *.tar
 *.zip
-<<<<<<< HEAD
 
-=======
- 
->>>>>>> a77b28c
 # Logs and databases #
 ######################
 *.log
 *.sql
 *.sqlite
-<<<<<<< HEAD
 
-=======
- 
->>>>>>> a77b28c
 # OS generated files #
 ######################
 .DS_Store
@@ -69,8 +57,5 @@ langstroth/nagios_uat.py
 langstroth/data
 langstroth/data/*
 *.db
-<<<<<<< HEAD
 /langstroth.egg-info/
 /.tox/
-=======
->>>>>>> a77b28c
