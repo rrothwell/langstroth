@@ -1,4 +1,5 @@
 # Django test settings for langstroth project.
+from utilities import file
 from os import path
 from os import environ
 
@@ -7,13 +8,8 @@ from .defaults import *  # NOQA
 
 TEST_MODE = True
 
-# Either set these values as environment variables in the Eclipse IDE
-# Or have the install_uat.sh script sed them to the real passwords.
-DB_PASSWORD = environ['LANGSTROTH_DEV_DB_PASSWORD']
-NAGIOS_PASSWORD = environ['LANGSTROTH_DEV_NAGIOS_PASSWORD']
-
-DEFAULT_DATABASE_NAME = 'langstroth'
-ALLOCATION_DATABASE_NAME = 'nectar_allocations'
+DEFAULT_DATABASE_NAME = 'langstroth.db'
+ALLOCATION_DATABASE_NAME = 'nectar_allocations.db'
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -21,18 +17,23 @@ TEMPLATE_DEBUG = DEBUG
 DATABASES = {
     # See: https://docs.djangoproject.com/en/1.6/intro/tutorial01/
     'default': {
-            'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME': path.join(path.dirname(__file__), DEFAULT_DATABASE_NAME),  # Or path to database file if using sqlite3.
-            'TEST_NAME': path.join(path.dirname(__file__), DEFAULT_DATABASE_NAME),
+            # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+            'ENGINE': 'django.db.backends.sqlite3',
+            # Or path to database file if using sqlite3.
+            'NAME': file.absolute_path(DEFAULT_DATABASE_NAME),
+            'TEST_NAME': file.absolute_path(DEFAULT_DATABASE_NAME),
         },
     # See: https://docs.djangoproject.com/en/1.6/topics/db/multi-db/
     'allocations_db': {
-            'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME': path.join(path.dirname(__file__), ALLOCATION_DATABASE_NAME),  # Or path to database file if using sqlite3.
-            'TEST_NAME': path.join(path.dirname(__file__), ALLOCATION_DATABASE_NAME),
+            # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+            'ENGINE': 'django.db.backends.sqlite3',
+            # Or path to database file if using sqlite3.
+            'NAME': file.absolute_path(ALLOCATION_DATABASE_NAME),
+            'TEST_NAME': file.absolute_path(ALLOCATION_DATABASE_NAME),
     }
 }
 DATABASE_ROUTERS = ['nectar_allocations.router_for_testing.TestRouter']
+FIXTURE_DIRS = ()
 
 # Password strings populated by an edited version of the install_uat.sh script.
 NAGIOS_URL = "http://localhost:8000/static/avail.html"
@@ -45,8 +46,8 @@ GRAPHITE_URL = "http://graphite.dev.rc.nectar.org.au"
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-    path.join(path.dirname(__file__), "static"),
-    path.join(path.dirname(__file__), "data"),
+    file.absolute_path("static"),
+    file.absolute_path("data"),
 
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
@@ -69,4 +70,9 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
 )
 
-LOGGING['handlers']['file']['filename'] = path.join(path.dirname(__file__), "../logs/debug.log")
+LOGGING['handlers']['file'] = {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            # Create the log directory with the correct permissions by hand.
+            'filename': file.absolute_path("../logs/debug.log")
+        }

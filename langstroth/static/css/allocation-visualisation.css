@@ -2,12 +2,12 @@ ul.breadcrumb {
     height: 36px;
 }
 
-.top-buffer { 
-    margin-top:20px; 
+.top-buffer {
+    margin-top:20px;
 }
 
-.bottom-buffer { 
-    margin-bottom:100px; 
+.bottom-buffer {
+    margin-bottom:100px;
 }
 
 .chart-footer {
@@ -39,10 +39,10 @@ table.for-projects caption {
     font-weight: 500;
 }
 
- .table-hover tbody tr:hover td {
+.table-hover tbody tr:hover td {
     background-color: Blue;
     color: White;
-}     
+}
 
 .opaque-plot-label {
     opacity:0.5;
