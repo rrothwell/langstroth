@@ -3,6 +3,7 @@ from datetime import date
 
 from user_statistics.models.registration import UserRegistration
 
+
 class UserRegistrationTest(unittest.TestCase):
 
     barrym = None
@@ -99,6 +100,3 @@ class UserRegistrationTest(unittest.TestCase):
         date0 = date(2014, 02, 16)
         last_month_date = UserRegistration.last_date_of_month(date0)
         self.assertEqual(date(2014, 2, 28), last_month_date)
-
-
-

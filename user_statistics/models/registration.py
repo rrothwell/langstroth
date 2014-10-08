@@ -6,8 +6,10 @@ from django.conf import settings
 
 class UserRegistration(models.Model):
 
-    user_name = models.CharField(max_length=80, db_column="user_name", null=False)
-    creation_time = models.DateTimeField(db_column="term", null=False)
+    user_name = models.CharField(
+        max_length=80, db_column="user_name", null=False)
+    creation_time = models.DateTimeField(
+        db_column="term", null=False)
 
     def __unicode__(self):
         return self.user_name + '(' + self.id + ')'
@@ -18,8 +20,8 @@ class UserRegistration(models.Model):
         db_table = 'user_statistics_registration'
         managed = False if not settings.TEST_MODE else True
 
-    @staticmethod
-    def history():
+    @classmethod
+    def history(cls):
         # Null dates will not be counted.
         history = UserRegistration.objects.exclude(creation_time__isnull=True)
         # Invalid dates (e.g. 0000-00-00 00:00:00) will not be counted.
@@ -32,8 +34,8 @@ class UserRegistration(models.Model):
             history_items.append(item)
         return history_items
 
-    @staticmethod
-    def frequency():
+    @classmethod
+    def frequency(cls):
         # Null dates will not be counted.
         history = UserRegistration.objects.exclude(creation_time__isnull=True)
         # Invalid dates (e.g. 0000-00-00 00:00:00) will not be counted.
@@ -69,9 +71,9 @@ class UserRegistration(models.Model):
         frequency_items = sorted(frequency_items, key=lambda item: item['date'])
         return frequency_items
 
-    @staticmethod
-    def monthly_frequency():
-        daily_registrations = UserRegistration.frequency()
+    @classmethod
+    def monthly_frequency(cls):
+        daily_registrations = cls.frequency()
         first = daily_registrations[0]
         last = daily_registrations[len(daily_registrations) - 1]
         first_date = first['date']
@@ -102,20 +104,20 @@ class UserRegistration(models.Model):
         monthly_registrations = sorted(monthly_registrations, key=lambda item: item['date'])
         return monthly_registrations
 
-    @staticmethod
-    def mid_month(date):
+    @classmethod
+    def mid_month(cls, date):
         begin_month_date = datetime.date(date.year, date.month, 1)
         end_month_date = (date + timedelta(days=31)).replace(day=1)
         end_month_date += datetime.timedelta(days=-1)
         middle_day = (end_month_date.day + begin_month_date.day) / 2
         return  datetime.date(date.year, date.month, middle_day)
 
-    @staticmethod
-    def last_date_of_month(date):
+    @classmethod
+    def last_date_of_month(cls, date):
         return (date + timedelta(days=31)).replace(day=1) - timedelta(days=1)
 
-    @staticmethod
-    def user_dict():
+    @classmethod
+    def user_dict(cls):
         # Null dates will not be counted.
         pairs = UserRegistration.objects.exclude(creation_time__isnull=True)
         # Invalid dates (e.g. 0000-00-00 00:00:00) will not be counted.

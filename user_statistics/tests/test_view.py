@@ -1,5 +1,6 @@
 from django.test import TestCase
 
+
 class UserStatisticsViewTest(TestCase):
 
     fixtures = ['user_statistics_0']
