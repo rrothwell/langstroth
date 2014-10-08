@@ -1,8 +1,10 @@
 import datetime
 from datetime import timedelta
+from operator import itemgetter
 
 from django.db import models
 from django.conf import settings
+
 
 class UserRegistration(models.Model):
 
@@ -25,12 +27,14 @@ class UserRegistration(models.Model):
         # Null dates will not be counted.
         history = UserRegistration.objects.exclude(creation_time__isnull=True)
         # Invalid dates (e.g. 0000-00-00 00:00:00) will not be counted.
-        history = [history_item for history_item in history if history_item.creation_time]
+        history = [history_item for history_item in history
+                   if history_item.creation_time]
         history_items = []
         for record in history:
             item = {}
             item['user_name'] = record.user_name
-            item['creation_time'] = record.creation_time.strftime('%Y-%m-%d %H:%M:%S')
+            item['creation_time'] = record.creation_time.strftime(
+                '%Y-%m-%d %H:%M:%S')
             history_items.append(item)
         return history_items
 
@@ -39,10 +43,12 @@ class UserRegistration(models.Model):
         # Null dates will not be counted.
         history = UserRegistration.objects.exclude(creation_time__isnull=True)
         # Invalid dates (e.g. 0000-00-00 00:00:00) will not be counted.
-        history = [history_item for history_item in history if history_item.creation_time]
+        history = [history_item for history_item in history
+                   if history_item.creation_time]
 
         # Build a sequence of dates covering the date range in question.
-        # history is ordered by creation time so first and last date should give range.
+        # history is ordered by creation time so first
+        # and last date should give range.
         first = history[0]
         last = history[len(history) - 1]
         first_date = first.creation_time.date()
@@ -57,7 +63,7 @@ class UserRegistration(models.Model):
         for record in history:
             creation_time = record.creation_time
             date = creation_time.date()
-            if not date in known_dates:
+            if date not in known_dates:
                 # Should not get here.
                 known_dates[date] = 0
             known_dates[date] += 1
@@ -67,8 +73,10 @@ class UserRegistration(models.Model):
         for date in known_dates:
             item = {'date': date, 'count': known_dates[date]}
             frequency_items.append(item)
-        # Data were stored in dictionary so not necessarily sorted by date, so resort by date.
-        frequency_items = sorted(frequency_items, key=lambda item: item['date'])
+        # Data were stored in dictionary so not necessarily
+        # sorted by date, so resort by date.
+        frequency_items = sorted(
+            frequency_items, key=itemgetter('date'))
         return frequency_items
 
     @classmethod
@@ -101,7 +109,9 @@ class UserRegistration(models.Model):
         for month in known_months:
             item = {'date': month, 'count': known_months[month]}
             monthly_registrations.append(item)
-        monthly_registrations = sorted(monthly_registrations, key=lambda item: item['date'])
+
+        monthly_registrations = sorted(
+            monthly_registrations, key=itemgetter('date'))
         return monthly_registrations
 
     @classmethod
@@ -110,7 +120,7 @@ class UserRegistration(models.Model):
         end_month_date = (date + timedelta(days=31)).replace(day=1)
         end_month_date += datetime.timedelta(days=-1)
         middle_day = (end_month_date.day + begin_month_date.day) / 2
-        return  datetime.date(date.year, date.month, middle_day)
+        return datetime.date(date.year, date.month, middle_day)
 
     @classmethod
     def last_date_of_month(cls, date):
@@ -128,4 +138,3 @@ class UserRegistration(models.Model):
             value = pair.creation_time.strftime('%Y-%m-%d %H:%M:%S')
             code_map[key] = value
         return code_map
-

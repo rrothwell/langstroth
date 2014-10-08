@@ -6,10 +6,13 @@ from user_statistics.models.registration import UserRegistration
 
 LOG = logging.getLogger(__name__)
 
+
 # Web pages
+
 
 def index_page(request):
     return trend_visualisation_page(request)
+
 
 def trend_visualisation_page(request):
     context = {
@@ -17,7 +20,9 @@ def trend_visualisation_page(request):
         "tagline": ""}
     return render(request, "user_statistics.html", context)
 
+
 # Web services with JSON pay loads.
+
 
 def registrations_history(request):
     registration_history = UserRegistration.history()
@@ -25,13 +30,18 @@ def registrations_history(request):
     LOG.debug("Registration history REST response: " + json_string)
     return HttpResponse(json_string, "application/json")
 
+
+def end_month_str(date):
+    return UserRegistration.last_date_of_month(date).strftime('%Y-%m-%d')
+
+
 def registrations_frequency(request):
     # OR registration_frequency = UserRegistration.frequency()
     registration_frequency = UserRegistration.monthly_frequency()
     # Convert all dates to string dates.
     registrations = [
         {
-            'date': UserRegistration.last_date_of_month(item['date']).strftime('%Y-%m-%d'),
+            'date': end_month_str(item['date']),
             'count': item['count']
         } for item in registration_frequency
     ]
@@ -39,4 +49,3 @@ def registrations_frequency(request):
     json_string = dumps(registrations)
     LOG.debug("Registration frequency REST response: " + json_string)
     return HttpResponse(json_string, "application/json")
-
