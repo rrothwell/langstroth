@@ -29,77 +29,42 @@ class AllocationRequest(models.Model):
     )
 
     status = models.CharField(
-        max_length=1, db_column="status",
-        null=False, choices=STATUS_CHOICES, default='N')
-    created_by = models.CharField(
-        max_length=100, db_column="created_by", null=False)
-    submit_date = models.DateField(
-        db_column="submit_date", null=False, default='2012-01-16')
-    project_name = models.CharField(
-        max_length=200, db_column="project_name", null=False)
-    contact_email = models.CharField(
-        max_length=75, db_column="contact_email", null=False)
-    start_date = models.DateField(
-        db_column="start_date", null=False, default='2012-01-16')
-    end_date = models.DateField(
-        db_column="end_date", null=False, default='2012-01-16')
+        max_length=1, null=False, choices=STATUS_CHOICES, default='N')
+    created_by = models.CharField(max_length=100, null=False)
+    submit_date = models.DateField(null=False, default='2012-01-16')
+    project_name = models.CharField(max_length=200, null=False)
+    contact_email = models.CharField(max_length=75, null=False)
+    start_date = models.DateField(null=False, default='2012-01-16')
+    end_date = models.DateField(null=False, default='2012-01-16')
     primary_instance_type = models.CharField(
-        max_length=1, db_column="primary_instance_type",
-        null=False, choices=INSTANCE_TYPE_CHOICES, default='S')
-    cores = models.IntegerField(
-        db_column="cores", null=False, default=1)
-    core_hours = models.IntegerField(
-        db_column="core_hours", null=False, default=100)
-    instances = models.IntegerField(
-        db_column="instances", null=False, default=1)
-    object_storage_GBs = models.IntegerField(
-        db_column="object_storage_GBs", null=False, default=0)
-    use_case = models.TextField(
-        db_column="use_case", null=False)
-    usage_patterns = models.TextField(
-        db_column="usage_patterns", null=False)
-    geographic_requirements = models.TextField(
-        db_column="geographic_requirements", null=False)
-    field_of_research_1 = models.CharField(
-        max_length=6, db_column="field_of_research_1", null=True)
-    for_percentage_1 = models.IntegerField(
-        db_column="for_percentage_1", null=False, default=0)
-    field_of_research_2 = models.CharField(
-        max_length=6, db_column="field_of_research_2", null=True)
-    for_percentage_2 = models.IntegerField(
-        db_column="for_percentage_2", null=False, default=0)
-    field_of_research_3 = models.CharField(
-        max_length=6, db_column="field_of_research_3", null=True)
-    for_percentage_3 = models.IntegerField(
-        db_column="for_percentage_3", null=False, default=0)
-    tenant_uuid = models.CharField(
-        max_length=36, db_column="tenant_uuid", null=True)
-    instance_quota = models.IntegerField(
-        db_column="instance_quota", null=False, default=0)
-    ram_quota = models.IntegerField(
-        db_column="ram_quota", null=False, default=0)
-    core_quota = models.IntegerField(
-        db_column="core_quota", null=False, default=0)
-    tenant_name = models.CharField(
-        max_length=100, db_column="tenant_name", null=True)
-    status_explanation = models.CharField(
-        max_length=200, db_column="status_explanation", null=True)
-    volume_gb = models.IntegerField(
-        db_column="volume_gb", null=False, default=0)
-    volume_zone = models.CharField(
-        max_length=64, db_column="volume_zone", null=True)
-    object_storage_zone = models.CharField(
-        max_length=64, db_column="object_storage_zone", null=True)
-    volume_quota = models.IntegerField(
-        db_column="volume_quota", null=False, default=0)
-    approver_email = models.CharField(
-        max_length=75, db_column="approver_email", null=True)
-    modified_time = models.DateTimeField(
-        default=timezone.now, db_column="modified_time", null=False)
+        max_length=1, null=False, choices=INSTANCE_TYPE_CHOICES, default='S')
+    cores = models.IntegerField(null=False, default=1)
+    core_hours = models.IntegerField(null=False, default=100)
+    instances = models.IntegerField(null=False, default=1)
+    object_storage_GBs = models.IntegerField(null=False, default=0)
+    use_case = models.TextField(null=False)
+    usage_patterns = models.TextField(null=False)
+    geographic_requirements = models.TextField(null=False)
+    field_of_research_1 = models.CharField(max_length=6, null=True)
+    for_percentage_1 = models.IntegerField(null=False, default=0)
+    field_of_research_2 = models.CharField(max_length=6, null=True)
+    for_percentage_2 = models.IntegerField(null=False, default=0)
+    field_of_research_3 = models.CharField(max_length=6, null=True)
+    for_percentage_3 = models.IntegerField(null=False, default=0)
+    tenant_uuid = models.CharField(max_length=36, null=True)
+    instance_quota = models.IntegerField(null=False, default=0)
+    ram_quota = models.IntegerField(null=False, default=0)
+    core_quota = models.IntegerField(null=False, default=0)
+    tenant_name = models.CharField(max_length=100, null=True)
+    status_explanation = models.CharField(max_length=200, null=True)
+    volume_gb = models.IntegerField(null=False, default=0)
+    volume_zone = models.CharField(max_length=64, null=True)
+    object_storage_zone = models.CharField(max_length=64, null=True)
+    volume_quota = models.IntegerField(null=False, default=0)
+    approver_email = models.CharField(max_length=75, null=True)
+    modified_time = models.DateTimeField(default=timezone.now, null=False)
 
-    parent_request = models.ForeignKey(
-        'self',
-        db_column="parent_request_id", null=True)
+    parent_request = models.ForeignKey('self', null=True)
 
     def __unicode__(self):
         return self.project_name + '(' + self.id + ')'
@@ -111,8 +76,8 @@ class AllocationRequest(models.Model):
         managed = False if not settings.TEST_MODE else True
 
     # Refer to query for view view_institution_clean (Alan).
-    @classmethod
-    def strip_email_sub_domains(cls, domain):
+    @staticmethod
+    def strip_email_sub_domains(domain):
         prefix = domain.split('.', 1)[0]
         if prefix in ('my', 'ems', 'exchange', 'groupwise',
                       'student', 'students', 'studentmail'):
@@ -129,8 +94,8 @@ class AllocationRequest(models.Model):
             return 'une.edu.au'
         return domain
 
-    @classmethod
-    def extract_email_domain(cls, email_address):
+    @staticmethod
+    def extract_email_domain(email_address):
         _, _, domain = email_address.partition('@')
         return domain
 
@@ -155,8 +120,8 @@ class AllocationRequest(models.Model):
                 seen.add(allocation.project_name)
         return keep
 
-    @classmethod
-    def is_valid_for_code(cls, potential_for_code):
+    @staticmethod
+    def is_valid_for_code(potential_for_code):
         return potential_for_code is not None
 
     """ The most fine-grained field-of-research code
@@ -165,8 +130,8 @@ class AllocationRequest(models.Model):
     The more general FOR codes for this field-of-research
     would be the leading  4 (= '9876') and 2 (= '98') digits.
     """
-    @classmethod
-    def apply_for_code_to_summary(cls, allocation_summary, code):
+    @staticmethod
+    def apply_for_code_to_summary(allocation_summary, code):
         allocation_summary['for_2'] = code[:2]
         allocation_summary['for_4'] = code[:4]
         allocation_summary['for_6'] = code[:6]
@@ -276,8 +241,8 @@ class AllocationRequest(models.Model):
 
         return allocations_tree
 
-    @classmethod
-    def create_allocation_tree_branch_node(cls, name):
+    @staticmethod
+    def create_allocation_tree_branch_node(name):
         return {'name': name, 'children': []}
 
     @classmethod
@@ -326,15 +291,14 @@ class AllocationRequest(models.Model):
                     node_children['children'].append(allocation_items)
 
     @classmethod
-    def project_allocations_from_allocation_request_id(
-            cls, allocation_request_id):
-        base_request = cls.objects.get(pk=allocation_request_id)
+    def get_all_for_project(cls, request_id):
+        base_request = cls.objects.get(pk=request_id)
         project_summary = list()
         project_record = cls.__project_summary_record(base_request)
         project_summary.append(project_record)
         other_requests = cls.objects \
             .filter(project_name=base_request.project_name) \
-            .exclude(id=allocation_request_id)
+            .exclude(id=request_id)
         for other_request in other_requests:
             project_record = cls.__project_summary_record(other_request)
             project_summary.append(project_record)
@@ -342,9 +306,8 @@ class AllocationRequest(models.Model):
         return project_summary
 
     @classmethod
-    def project_from_allocation_request_id(cls, allocation_request_id):
-        allocations = cls.project_allocations_from_allocation_request_id(
-            allocation_request_id)
+    def project_from_request_id(cls, request_id):
+        allocations = cls.get_all_for_project(request_id)
         project_summary = allocations[-1]
         return project_summary
 

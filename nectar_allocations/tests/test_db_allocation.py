@@ -135,11 +135,14 @@ class AllocationDBTest(TestCase):
         self.assertEquals(3, len(allocations_tree))
 
         self.assertEquals('USQ eResearch Services Sandbox',
-            allocations_tree['09']['0999']['099901'][0]['projectName'])  # noqa
+                          allocations_tree['09']['0999']
+                          ['099901'][0]['projectName'])
         self.assertEquals('USQ eResearch Services Sandbox',
-            allocations_tree['07']['0701']['070104'][0]['projectName'])  # noqa
+                          allocations_tree['07']['0701']
+                          ['070104'][0]['projectName'])
         self.assertEquals('UoM_Trajectory_Inference_Attacks',
-            allocations_tree['08']['0801']['080109'][0]['projectName'])  # noqa
+                          allocations_tree['08']['0801']
+                          ['080109'][0]['projectName'])
 
     def test_restructure_allocations_tree(self):
         name_children_tree = AllocationRequest.restructure_allocations_tree()
@@ -194,11 +197,10 @@ class AllocationDBTest(TestCase):
         self.assertEquals('USQ eResearch Services Sandbox',
                           project_items['name'])
 
-    def test_project_allocations_from_allocation_request_id(self):
+    def test_get_all_for_project(self):
         AllocationRequest.show_private_fields = True
-        allocation_request_id = 1654
-        project_allocations = AllocationRequest \
-            .project_allocations_from_allocation_request_id(allocation_request_id)  # noqa
+        request_id = 1654
+        project_allocations = AllocationRequest.get_all_for_project(request_id)
 
         self.assertEquals(1, len(project_allocations))
         self.assertEquals('UoM_Trajectory_Inference_Attacks',
@@ -214,11 +216,10 @@ class AllocationDBTest(TestCase):
                           'is needed. Please contact [XXXX].',
                           project_allocations[0]['usage_patterns'])
 
-    def test_project_allocations_from_allocation_request_id_with_privacy(self):
+    def test_get_all_for_project_with_privacy(self):
         AllocationRequest.show_private_fields = False
-        allocation_request_id = 1654
-        project_allocations = AllocationRequest \
-            .project_allocations_from_allocation_request_id(allocation_request_id)  # noqa
+        request_id = 1654
+        project_allocations = AllocationRequest.get_all_for_project(request_id)
 
         self.assertEquals(1, len(project_allocations))
         self.assertEquals('UoM_Trajectory_Inference_Attacks',
@@ -228,11 +229,11 @@ class AllocationDBTest(TestCase):
         self.assertFalse('use_case' in project_allocations[0])
         self.assertFalse('usage_patterns' in project_allocations[0])
 
-    def test_project_allocations_from_allocation_request_id_with_multi_requests(self):  # noqa
+    def test_get_all_for_project_with_multi_requests(self):
         AllocationRequest.show_private_fields = True
-        allocation_request_id = 1667
+        request_id = 1667
         project_allocations = AllocationRequest \
-            .project_allocations_from_allocation_request_id(allocation_request_id)  # noqa
+            .get_all_for_project(request_id)
         self.assertEquals(2, len(project_allocations))
 
         self.assertEquals('USQ eResearch Services Sandbox',
@@ -265,11 +266,11 @@ class AllocationDBTest(TestCase):
                           'resesearch group. Please contact [XXXX].',
                           project_allocations[0]['usage_patterns'])
 
-    def test_project_allocations_from_allocation_request_id_with_multi_requests_with_privacy(self):  # noqa
+    def test_get_all_for_project_with_multi_requests_with_privacy(self):
         AllocationRequest.show_private_fields = False
-        allocation_request_id = 1667
+        request_id = 1667
         project_allocations = AllocationRequest \
-            .project_allocations_from_allocation_request_id(allocation_request_id)  # noqa
+            .get_all_for_project(request_id)
         self.assertEquals(2, len(project_allocations))
 
         self.assertEquals('USQ eResearch Services Sandbox',
@@ -285,11 +286,11 @@ class AllocationDBTest(TestCase):
         self.assertEquals('2014-05-17', project_allocations[1]['end_date'])
         self.assertFalse('use_case' in project_allocations[1])
 
-    def test_projects_from_allocation_request_id(self):
+    def test_projects_from_request_id(self):
         AllocationRequest.show_private_fields = True
-        allocation_request_id = 1654
+        request_id = 1654
         project_summary = AllocationRequest \
-            .project_from_allocation_request_id(allocation_request_id)
+            .project_from_request_id(request_id)
 
         self.assertEquals('UoM_Trajectory_Inference_Attacks',
                           project_summary['project_name'])
@@ -317,11 +318,11 @@ class AllocationDBTest(TestCase):
         self.assertEquals(None, project_summary['field_of_research_3'])
         self.assertEquals(0, project_summary['for_percentage_3'])
 
-    def test_projects_from_allocation_request_id_with_privacy(self):
+    def test_projects_from_request_id_with_privacy(self):
         AllocationRequest.show_private_fields = False
-        allocation_request_id = 1654
+        request_id = 1654
         project_summary = AllocationRequest \
-            .project_from_allocation_request_id(allocation_request_id)
+            .project_from_request_id(request_id)
 
         self.assertEquals('UoM_Trajectory_Inference_Attacks',
                           project_summary['project_name'])
@@ -343,11 +344,11 @@ class AllocationDBTest(TestCase):
         self.assertEquals(None, project_summary['field_of_research_3'])
         self.assertEquals(0, project_summary['for_percentage_3'])
 
-    def test_projects_from_allocation_request_id_with_multi_requests(self):
+    def test_projects_from_request_id_with_multi_requests(self):
         AllocationRequest.show_private_fields = True
-        allocation_request_id = 1667
+        request_id = 1667
         project_summary = AllocationRequest \
-            .project_from_allocation_request_id(allocation_request_id)
+            .project_from_request_id(request_id)
 
         self.assertEquals('USQ eResearch Services Sandbox',
                           project_summary['project_name'])
@@ -377,11 +378,11 @@ class AllocationDBTest(TestCase):
         self.assertEquals(None, project_summary['field_of_research_3'])
         self.assertEquals(0, project_summary['for_percentage_3'])
 
-    def test_projects_from_allocation_request_id_with_multi_requests_with_privacy(self):  # noqa
+    def test_projects_from_request_id_with_multi_requests_with_privacy(self):
         AllocationRequest.show_private_fields = False
-        allocation_request_id = 1667
+        request_id = 1667
         project_summary = AllocationRequest \
-            .project_from_allocation_request_id(allocation_request_id)
+            .project_from_request_id(request_id)
 
         self.assertEquals('USQ eResearch Services Sandbox',
                           project_summary['project_name'])

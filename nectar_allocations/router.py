@@ -9,9 +9,9 @@ class AllocationsRouter(object):
     # Database is read-only so no def for db_for_write
 
     def allow_relation(self, obj1, obj2, **hints):
-        if obj1._meta.app_label == 'nectar_allocations' or \
-            obj2._meta.app_label == 'nectar_allocations':  # noqa
-                return True
+        if obj1._meta.app_label == 'nectar_allocations' \
+                or obj2._meta.app_label == 'nectar_allocations':
+            return True
         return None
 
     def allow_syncdb(self, db, model):

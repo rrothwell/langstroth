@@ -1,9 +1,16 @@
-from django.utils import unittest
 import json
-from utilities.diff import Diff
-from utilities import file
+from os import path
 
+from django.utils import unittest
+
+from .diff import Diff
 from nectar_allocations.models.allocation import AllocationRequest
+
+
+def path_for_tests(file_name):
+    """Returns the absolute path to the merged dirname of the pathname and
+    filename."""
+    return path.abspath(path.join(path.dirname(__file__), file_name))
 
 
 @classmethod
@@ -146,7 +153,7 @@ class AllocationTest(unittest.TestCase):
             'une.edu.au')
 
     def test_strip_email_group_translates_selection(self):
-        file_name = file.absolute_path("institution_cleaning.json", __file__)
+        file_name = path_for_tests("institution_cleaning.json")
         with open(file_name) as institutions_file:
             institutions = json.load(institutions_file)
         for institution in institutions:
@@ -310,11 +317,11 @@ class AllocationTest(unittest.TestCase):
         df = Diff(expected, actual)
         self.assertEqual([], df.difference)
 
-    """Sort allocations tree.
-
-     Needed since the JSON diff code is sensitive to key order.
-    """
     def sort_tree(self, allocations):
+        """Sort allocations tree.
+
+         Needed since the JSON diff code is sensitive to key order.
+        """
         # allocation_tree at the top level is a list.
         allocations.sort(key=lambda allocation: allocation['name'])
         for allocation in allocations:
