@@ -1,13 +1,13 @@
 # Django settings for langstroth project.
 import sys
-from utilities import file
+from os import path
 
 # Override this to TEST_MODE = False for the production settings file.
 # It's True here so we can populate the database with reference data.
 TEST_MODE = True
 
-DEFAULT_DATABASE_NAME = 'langstroth.db'
-ALLOCATION_DATABASE_NAME = 'nectar_allocations.db'
+DEFAULT_DATABASE_NAME = '../langstroth.db'
+ALLOCATION_DATABASE_NAME = '../nectar_allocations.db'
 
 NAGIOS_PASSWORD = ""
 
@@ -20,26 +20,41 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+
+def path_merge(pathname, filename):
+    """Returns the absolute path to the merged dirname of the pathname and
+    filename."""
+    return path.abspath(path.join(path.dirname(pathname), filename))
+
 DATABASES = {
     # See: https://docs.djangoproject.com/en/1.6/intro/tutorial01/
     'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': file.absolute_path(DEFAULT_DATABASE_NAME),
-            'TEST_NAME': file.absolute_path(DEFAULT_DATABASE_NAME),
-        },
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': path_merge(__file__, DEFAULT_DATABASE_NAME),
+        'TEST_NAME': path_merge(__file__, DEFAULT_DATABASE_NAME),
+    },
     # See: https://docs.djangoproject.com/en/1.6/topics/db/multi-db/
     'allocations_db': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': file.absolute_path(ALLOCATION_DATABASE_NAME),
-            'TEST_NAME': file.absolute_path(ALLOCATION_DATABASE_NAME),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': path_merge(__file__, ALLOCATION_DATABASE_NAME),
+        'TEST_NAME': path_merge(__file__, ALLOCATION_DATABASE_NAME),
     }
 }
 DATABASE_ROUTERS = ['nectar_allocations.router.AllocationsRouter']
 FIXTURE_DIRS = (
-    file.absolute_path('../nectar_allocations/reference_data/'),
+    path_merge(__file__, '../nectar_allocations/reference_data/')
 )
 
+# The URL to your Nagios installation.
 NAGIOS_URL = "http://nagios.test/cgi-bin/nagios3/"
+
+# The user and password to authenticate to Nagios as.
+NAGIOS_AUTH = ("", "")
+
+# The service group to use for calculating if services are up and
+# their availability.
+NAGIOS_SERVICE_GROUP = 'f5-endpoints'
+
 AVAILABILITY_QUERY_TEMPLATE = "avail.cgi" \
     "?t1=%s" \
     "&t2=%s" \
@@ -56,12 +71,9 @@ AVAILABILITY_QUERY_TEMPLATE = "avail.cgi" \
 STATUS_QUERY_TEMPLATE = "status.cgi" \
     "?servicegroup=%s" \
     "&style=detail"
-# Dummy password. Replace in production.
-NAGIOS_AUTH = ("sam", NAGIOS_PASSWORD)
-NAGIOS_SERVICE_GROUP = 'f5-endpoints'
 
-# Dummy service. Replace in production.
-GRAPHITE_URL = "http://graphite.mgmt.melbourne.rc.nectar.org.au"
+# The URL to the graphite web interface
+GRAPHITE_URL = "http://graphite.test"
 
 # Hosts/domain names that are valid for this site; required if DEBUG is False
 # See https://docs.djangoproject.com/en/1.5/ref/settings/#allowed-hosts
@@ -111,7 +123,7 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-    file.absolute_path("static"),
+    path_merge(__file__, "static"),
     # Put strings here, like "/home/html/static"
     # or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
@@ -160,7 +172,7 @@ ROOT_URLCONF = 'langstroth.urls'
 WSGI_APPLICATION = 'langstroth.wsgi.application'
 
 TEMPLATE_DIRS = (
-    file.absolute_path("templates"),
+    path_merge(__file__, "templates"),
     # Put strings here, like "/home/html/django_templates"
     # or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
