@@ -21,7 +21,7 @@ var xAxis = d3.svg.axis()
     .outerTickSize([-HEIGHT])
     .tickPadding([8])
     .tickFormat(function(d, i) {
-        	return dateFormat(d);
+            return dateFormat(d);
     });
 
 var yAxis = d3.svg.axis()
@@ -46,70 +46,68 @@ var area = d3.svg.area()
 
 function visualise(trend) {
 
-	x.domain(d3.extent(trend, function(d) { 
-		return d.date; 
-	}));
-	y.domain([0, d3.max(trend, function(d) { 
-		return d.count;
-	})]);
+    x.domain(d3.extent(trend, function(d) { 
+        return d.date; 
+    }));
+    y.domain([0, d3.max(trend, function(d) { 
+        return d.count;
+    })]);
   
-	var path = svg.selectAll("path").data([trend]);	
-	path.attr("class", "area").attr("d", area);
-	path.enter().append("path").attr("class", "area").attr("d", area);
-	path.exit().remove();
+    var path = svg.selectAll("path").data([trend]); 
+    path.attr("class", "area").attr("d", area);
+    path.enter().append("path").attr("class", "area").attr("d", area);
+    path.exit().remove();
   
-	var xAxisG = svg.selectAll("g.x");
-	xAxisG.remove();
-	
-	  svg.append("g")
-	      .attr("class", "x axis")
-	      .attr("transform", "translate(0," + HEIGHT + ")")
-	      .call(xAxis);
-	  
-		var yAxisG = svg.selectAll("g.y");
-		yAxisG.remove();
+    var xAxisG = svg.selectAll("g.x");
+    xAxisG.remove();
+    
+      svg.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + HEIGHT + ")")
+          .call(xAxis);
+      
+        var yAxisG = svg.selectAll("g.y");
+        yAxisG.remove();
 
-		svg.append("g")
-	      .attr("class", "y axis")
-	      .call(yAxis)
-	      ;
+        svg.append("g")
+          .attr("class", "y axis")
+          .call(yAxis)
+          ;
 }
 
 function processResponse(registrationFrequency) {
-	var trend = [];
-	var sum = 0;
-	registrationFrequency.forEach(function(record) {
-		var item = {};
-		item.date = parseDate(record.date);
-		if (isCumulative) {
-			sum += +record.count;
-			item.count = sum;
-		} else {
-			item.count = +record.count;
-		}
-		trend.push(item);
-	  });
-	return trend;
+    var trend = [];
+    var sum = 0;
+    registrationFrequency.forEach(function(record) {
+        var item = {};
+        item.date = parseDate(record.date);
+        if (isCumulative) {
+            sum += +record.count;
+            item.count = sum;
+        } else {
+            item.count = +record.count;
+        }
+        trend.push(item);
+      });
+    return trend;
 }
 
 function load() {
-	d3.json("/user_statistics/rest/registrations/frequency", function(error, responseData) {
-		registrationFrequency = responseData;
-		var trend = processResponse(registrationFrequency);
-		visualise(trend);
-	});
+    d3.json("/user_statistics/rest/registrations/frequency", function(error, responseData) {
+        registrationFrequency = responseData;
+        var trend = processResponse(registrationFrequency);
+        visualise(trend);
+    });
 }
 
 load();
 
 function change() {
-	$('#graph-buttons button').removeClass('active');
-	$(this).addClass('active');
-	isCumulative = this.id == 'cumulative';
-	var trend = processResponse(registrationFrequency);
-	visualise(trend);
+    $('#graph-buttons button').removeClass('active');
+    $(this).addClass('active');
+    isCumulative = this.id == 'cumulative';
+    var trend = processResponse(registrationFrequency);
+    visualise(trend);
 }
 
 d3.selectAll("button").on("click", change);
-
-
