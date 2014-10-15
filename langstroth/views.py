@@ -67,7 +67,7 @@ def index(request):
         context['hosts'] = []
 
     if not status or not availability:
-        return render(request, "index.html", context, status=500)
+        return render(request, "index.html", context, status=503)
     return render(request, "index.html", context)
 
 
@@ -208,4 +208,3 @@ def total_cores_per_domain(request):
     cleaned = cleaned.values()
     cleaned.sort(key=itemgetter('value'))
     return HttpResponse(dumps(cleaned), req.headers['content-type'])
-
