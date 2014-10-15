@@ -1,4 +1,3 @@
-from django.conf.urls import handler500
 from django.conf.urls import patterns, include, url
 
 from langstroth import error
@@ -29,3 +28,4 @@ urlpatterns = patterns(
 )
 
 handler500 = error.handler500
+handler400 = error.handler500
