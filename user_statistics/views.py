@@ -24,11 +24,11 @@ def trend_visualisation_page(request):
 # Web services with JSON pay loads.
 
 
-def registrations_history(request):
-    registration_history = UserRegistration.history()
-    json_string = dumps(registration_history)
-    LOG.debug("Registration history REST response: " + json_string)
-    return HttpResponse(json_string, "application/json")
+# def registrations_history(request):
+#     registration_history = UserRegistration.history()
+#     json_string = dumps(registration_history)
+#     LOG.debug("Registration history REST response: " + json_string)
+#     return HttpResponse(json_string, "application/json")
 
 
 def end_month_str(date):

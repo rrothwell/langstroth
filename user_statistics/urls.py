@@ -15,8 +15,8 @@ urlpatterns = patterns(
 
     # Web services with JSON pay loads.
 
-    url(r'^rest/registrations/history$',
-        views.registrations_history, name='registrations_history'),
+    #     url(r'^rest/registrations/history$',
+    #         views.registrations_history, name='registrations_history'),
     url(r'^rest/registrations/frequency$',
         views.registrations_frequency, name='registrations_frequency'),
 )
