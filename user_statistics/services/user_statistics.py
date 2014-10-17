@@ -25,7 +25,7 @@ class UserStatistics(object):
 
     '''
     The Graphite query string needs to be url encoded.
-    # E.g. ?target=summarize(users.total,"1month","max")&format=json&from=20110801
+    # E.g. ?target=summarize(users.total,"1day","max")&format=json&from=20111201
     # becomes:
     # ?target=summarize(users.total%2C%227d%22%2C%22max%22)&format=json&from=20110801
     '''
@@ -112,7 +112,7 @@ class UserStatistics(object):
             day_count = current_total[cls.COUNT_INDEX]
             month = datetime.date(day_date.year, day_date.month, 1)
             if month in known_months:
-                known_months[month] += day_count
+                known_months[month] = max(int(day_count), known_months[month])
 
     @classmethod
     def monthly_bins_as_array(cls, month_bins):
@@ -132,10 +132,11 @@ class UserStatistics(object):
     @classmethod
     def monthly_frequency(cls):
         accumulated_users = cls.monthly_accumulated_users()
-        difference = 0
+        previous = 0
         frequency = []
         for cumulative_statistic in accumulated_users:
-            difference = cumulative_statistic['count'] - difference
+            difference = cumulative_statistic['count'] - previous
+            previous = cumulative_statistic['count']
             frequency_statistic = {
                 'date': cumulative_statistic["date"],
                 'count': difference}
@@ -167,7 +168,7 @@ class UserStatistics(object):
         Retrieve the history of the cumulative count of users
         added by the end of each day.
         '''
-        accumulated_users_at_end_of_month = 'summarize(users.total,"1day","max", True)'
+        accumulated_users_at_end_of_month = 'summarize(users.total,"1d","max", True)'
         return cls._query_graphite_api(accumulated_users_at_end_of_month)
 
     @classmethod
@@ -180,6 +181,6 @@ class UserStatistics(object):
             [('target', api_function)]
         query = '?' + urlencode(argments)
         response = requests.get(cls.GRAPHITE_API_URL + query)
-        body_str = response[1]
+        body_str = response.content
         data = json.loads(body_str)[0]['datapoints']
         return filter(lambda item: item[0] != None, data)

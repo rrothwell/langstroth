@@ -3,6 +3,7 @@ from json import dumps
 from django.http import HttpResponse
 from django.shortcuts import render
 from user_statistics.models.registration import UserRegistration
+from user_statistics.services.user_statistics import UserStatistics
 
 LOG = logging.getLogger(__name__)
 
@@ -37,7 +38,7 @@ def end_month_str(date):
 
 def registrations_frequency(request):
     # OR registration_frequency = UserRegistration.frequency()
-    registration_frequency = UserRegistration.monthly_frequency()
+    registration_frequency = UserStatistics.monthly_frequency()
     # Convert all dates to string dates.
     registrations = [
         {

@@ -2,7 +2,7 @@ from django.test import TestCase
 from pytest import fail
 
 import datetime
-from httplib2 import Response
+from requests import Response
 import requests
 from os import path
 
@@ -40,12 +40,13 @@ def dummy_get(url, **kwargs):
             "./users_total_daily_graphite_response.json")
         with open(file_path) as user_json_file:
             user_json = user_json_file.read()
-        headers = {'status': '200'}
-        body = user_json
-        return Response(headers), body
+        response = Response()
+        response.status_code = 200
+        response._content = user_json
+        return response
 
     fail("No response for URL: '%s'" % url)
-    return Response({}), ''
+    return Response()
 
 
 @classmethod
@@ -177,7 +178,7 @@ class UserStatisticsTest(TestCase):
         data = [datapoint0, datapoint1]
         UserStatistics.populate_month_bins(month_bins, data)
         self.assertEqual(1, len(month_bins))
-        self.assertEqual(12, month_bins[month])
+        self.assertEqual(7, month_bins[month])
 
     def test_populate_month_bins_for_two_months_two_data_points(self):
         month0 = datetime.date(2014, 10, 1)
