@@ -2,7 +2,6 @@ import logging
 from json import dumps
 from django.http import HttpResponse
 from django.shortcuts import render
-from user_statistics.models.registration import UserRegistration
 from user_statistics.services.user_statistics import UserStatistics
 
 LOG = logging.getLogger(__name__)
@@ -25,19 +24,11 @@ def trend_visualisation_page(request):
 # Web services with JSON pay loads.
 
 
-# def registrations_history(request):
-#     registration_history = UserRegistration.history()
-#     json_string = dumps(registration_history)
-#     LOG.debug("Registration history REST response: " + json_string)
-#     return HttpResponse(json_string, "application/json")
-
-
 def end_month_str(date):
-    return UserRegistration.last_date_of_month(date).strftime('%Y-%m-%d')
+    return UserStatistics.last_date_of_month(date).strftime('%Y-%m-%d')
 
 
 def registrations_frequency(request):
-    # OR registration_frequency = UserRegistration.frequency()
     registration_frequency = UserStatistics.monthly_frequency()
     # Convert all dates to string dates.
     registrations = [
@@ -46,7 +37,6 @@ def registrations_frequency(request):
             'count': item['count']
         } for item in registration_frequency
     ]
-    # registration_frequency = GoogleAnalytics.frequency()
     json_string = dumps(registrations)
     LOG.debug("Registration frequency REST response: " + json_string)
     return HttpResponse(json_string, "application/json")
