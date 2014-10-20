@@ -21,7 +21,7 @@ DATABASES = {
         # Or path to database file if using sqlite3.
         'NAME': path_merge(__file__, DEFAULT_DATABASE_NAME),
         'TEST_NAME': path_merge(__file__, DEFAULT_DATABASE_NAME),
-        },
+    },
     # See: https://docs.djangoproject.com/en/1.6/topics/db/multi-db/
     'allocations_db': {
         # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.

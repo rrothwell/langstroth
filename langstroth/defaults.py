@@ -2,6 +2,8 @@
 import sys
 from os import path
 
+from user_statistics.settings import *  # NOQA
+
 # Override this to TEST_MODE = False for the production settings file.
 # It's True here so we can populate the database with reference data.
 TEST_MODE = True
@@ -189,6 +191,7 @@ INSTALLED_APPS = (
     'langstroth',
     'nectar_status',
     'nectar_allocations',
+    'user_statistics',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:

@@ -30,45 +30,39 @@ class UserStatistics(object):
     # ?target=summarize(users.total%2C%227d%22%2C%22max%22)&format=json&from=20110801
     '''
 
-    GRAPHITE_API_URL = settings.GRAPHITE_URL + '/render'
+    __GRAPHITE_API_URL = settings.GRAPHITE_URL + '/render'
 
-    FORMAT = 'json'
+    __FORMAT = 'json'
 
-    # TODO: Should be found by querying the data somehow.
-    START_DATE = '20111201'
-
-    # TODO: Should be found by querying the data somehow.
-    END_DATE = '2014030'
-
-    BASE_ARGUMENTS = [
-        ('format', FORMAT),
-        ('from', START_DATE),
+    __BASE_ARGUMENTS = [
+        ('format', __FORMAT),
+        ('from', settings.USER_STATISTICS_START_DATE),
     ]
 
-    # Address the history components
+    # Addressing the history components
     # within a 2-member data-point array.
-    COUNT_INDEX = 0
-    DATE_INDEX = 1
+    __COUNT_INDEX = 0
+    __DATE_INDEX = 1
 
     @classmethod
-    def data_point_date(cls, datapoint):
-        return datetime.date.fromtimestamp(datapoint[cls.DATE_INDEX])
+    def _data_point_date(cls, datapoint):
+        return datetime.date.fromtimestamp(datapoint[cls.__DATE_INDEX])
 
     @classmethod
-    def data_point_month(cls, datapoint):
+    def _data_point_month(cls, datapoint):
         '''
         Return a month as signified by 
         the date of the first day of the month.
         '''
-        return datetime.date.fromtimestamp(datapoint[cls.DATE_INDEX]).replace(day=1)
+        return datetime.date.fromtimestamp(datapoint[cls.__DATE_INDEX]).replace(day=1)
 
     @classmethod
-    def data_point_last_month(cls, last_datapoint):
+    def _data_point_last_month(cls, last_datapoint):
         '''
         The statistics for the last month is always incomplete,
         so instead we return the previous month which will be complete.
         '''
-        last_month = cls.data_point_month(last_datapoint)
+        last_month = cls._data_point_month(last_datapoint)
         last_month = (last_month - timedelta(days=1)).replace(day=1)
         return last_month
 
@@ -77,7 +71,7 @@ class UserStatistics(object):
         return (date + timedelta(days=31)).replace(day=1) - timedelta(days=1)
 
     @classmethod
-    def date_range(cls, daily_accumulated_users):
+    def _date_range(cls, daily_accumulated_users):
         '''
         From the user history 
         calculate the inclusive data range
@@ -86,12 +80,12 @@ class UserStatistics(object):
         '''
         first = daily_accumulated_users[0]
         last = daily_accumulated_users[len(daily_accumulated_users) - 1]
-        first_month = cls.data_point_month(first)
-        last_month = cls.data_point_last_month(last)
+        first_month = cls._data_point_month(first)
+        last_month = cls._data_point_last_month(last)
         return first_month, last_month
 
     @classmethod
-    def create_month_bins(cls, first_month, last_month):
+    def _create_month_bins(cls, first_month, last_month):
         '''
         Build bins as a map.
         '''
@@ -103,19 +97,19 @@ class UserStatistics(object):
         return month_bins
 
     @classmethod
-    def populate_month_bins(cls, known_months, daily_accumulated_users):
+    def _populate_month_bins(cls, known_months, daily_accumulated_users):
         '''
         Populate month bins
         '''
         for current_total in daily_accumulated_users:
-            day_date = cls.data_point_date(current_total)
-            day_count = current_total[cls.COUNT_INDEX]
+            day_date = cls._data_point_date(current_total)
+            day_count = current_total[cls.__COUNT_INDEX]
             month = datetime.date(day_date.year, day_date.month, 1)
             if month in known_months:
                 known_months[month] = max(int(day_count), known_months[month])
 
     @classmethod
-    def monthly_bins_as_array(cls, month_bins):
+    def _monthly_bins_as_array(cls, month_bins):
         '''
         Reorganise monthly bins into a date sorted array of 
         dictionary items.
@@ -131,7 +125,7 @@ class UserStatistics(object):
 
     @classmethod
     def monthly_frequency(cls):
-        accumulated_users = cls.monthly_accumulated_users()
+        accumulated_users = cls._monthly_accumulated_users()
         previous = 0
         frequency = []
         for cumulative_statistic in accumulated_users:
@@ -144,7 +138,7 @@ class UserStatistics(object):
         return frequency
 
     @classmethod
-    def monthly_accumulated_users(cls):
+    def _monthly_accumulated_users(cls):
         '''
         Determine the history of the 
         cumulative registered user count
@@ -155,15 +149,15 @@ class UserStatistics(object):
         1month = 30 days exactly,
         and so doesn't produce the desired result.
         '''
-        daily_accumulated_users = cls.find_daily_accumulated_users()
-        first_month, last_month = cls.date_range(daily_accumulated_users)
-        month_bins = cls.create_month_bins(first_month, last_month)
-        cls.populate_month_bins(month_bins, daily_accumulated_users)
-        accumulated_registrations = cls.monthly_bins_as_array(month_bins)
+        daily_accumulated_users = cls._find_daily_accumulated_users()
+        first_month, last_month = cls._date_range(daily_accumulated_users)
+        month_bins = cls._create_month_bins(first_month, last_month)
+        cls._populate_month_bins(month_bins, daily_accumulated_users)
+        accumulated_registrations = cls._monthly_bins_as_array(month_bins)
         return accumulated_registrations
 
     @classmethod
-    def find_daily_accumulated_users(cls):
+    def _find_daily_accumulated_users(cls):
         '''
         Retrieve the history of the cumulative count of users
         added by the end of each day.
@@ -177,10 +171,10 @@ class UserStatistics(object):
         Issue a HTTP request to the Graphite end-point 
         and return just the data points as a list.
         '''
-        argments = cls.BASE_ARGUMENTS + \
+        argments = cls.__BASE_ARGUMENTS + \
             [('target', api_function)]
         query = '?' + urlencode(argments)
-        response = requests.get(cls.GRAPHITE_API_URL + query)
+        response = requests.get(cls.__GRAPHITE_API_URL + query)
         body_str = response.content
         data = json.loads(body_str)[0]['datapoints']
         return filter(lambda item: item[0] != None, data)
