@@ -28,34 +28,34 @@ Date.prototype.lastDateOfMonth = function() {
 
 var areaChart = nv.models.stackedAreaChart()
     .margin({right: 100})
-    .x(function(d) { 
-          return d[0].getTime(); 
-          })   
-    .y(function(d) { 
-          return d[1]; 
-          })  
-    .useInteractiveGuideline(true) 
-    .rightAlignYAxis(true) 
+    .x(function(d) {
+          return d[0].getTime();
+          })
+    .y(function(d) {
+          return d[1];
+          })
+    .useInteractiveGuideline(true)
+    .rightAlignYAxis(true)
     .transitionDuration(500)
     .showControls(false)
     .clipEdge(true);
-    
+
     areaChart.xAxis.tickFormat(function(d) {
     return shortDateFormat(new Date(d)) ;
     });
 
     areaChart.yAxis.tickFormat(frequencyFormat);
-    
+
 // Build histogram chart
-    
+
     var histoChart = nv.models.historicalBarChart()
-        .x(function(d, i) { 
-            return d[0].getTime(); 
-        })   
-        .y(function(d) { 
-            return d[1]; 
-        })  
-        .rightAlignYAxis(true) 
+        .x(function(d, i) {
+            return d[0].getTime();
+        })
+        .y(function(d) {
+            return d[1];
+        })
+        .rightAlignYAxis(true)
         .transitionDuration(500)
         .clipEdge(false);
 
@@ -66,10 +66,10 @@ var areaChart = nv.models.stackedAreaChart()
 
         histoChart.yAxis.tickFormat(frequencyFormat);
         histoChart.showLegend(true);
-        
+
 
 // Render the chart
-        
+
 var svg = null;
 
 function visualise(trend, chart) {
@@ -77,8 +77,8 @@ function visualise(trend, chart) {
     // Clean up the internal graph array.
     while(nv.graphs.length > 0) {
         nv.graphs.pop();
-    }   
-    
+    }
+
     // Freshen dom elements.
     if (svg) {
         svg.remove();
@@ -87,10 +87,10 @@ function visualise(trend, chart) {
 
     // Add the chosen graph
     nv.addGraph(function() {
-        svg.datum(trend).call(chart);   
+        svg.datum(trend).call(chart);
         nv.utils.windowResize(chart.update);
         return chart;
-    }); 
+    });
 }
 
 function processResponse(registrationFrequency, legendKey) {
@@ -148,7 +148,9 @@ function defineXTicks(trend) {
 }
 
 function load() {
-    d3.json("/user_statistics/rest/registrations/frequency", function(error, responseData) {
+    d3.json(
+        "/user_statistics/rest/registrations/frequency",
+        function(error, responseData) {
         registrationFrequency = responseData;
         var legendKey = CUMULATIVE_LABEL;
         var trend = processResponse(registrationFrequency, legendKey);

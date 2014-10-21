@@ -1,10 +1,7 @@
-import logging
 from json import dumps
 from django.http import HttpResponse
 from django.shortcuts import render
 from user_statistics.services.user_statistics import UserStatistics
-
-LOG = logging.getLogger(__name__)
 
 
 # Web pages
@@ -38,5 +35,4 @@ def registrations_frequency(request):
         } for item in registration_frequency
     ]
     json_string = dumps(registrations)
-    LOG.debug("Registration frequency REST response: " + json_string)
     return HttpResponse(json_string, "application/json")

@@ -19,15 +19,17 @@ class UserStatistics(object):
         a history of cumulative user registrations
     Proper month binning is supported.
 
-    Daily accumulated user counts are obtained 
+    Daily accumulated user counts are obtained
     by querying the Graphite service end-point.
     '''
 
     '''
     The Graphite query string needs to be url encoded.
-    # E.g. ?target=summarize(users.total,"1day","max")&format=json&from=20111201
+    # E.g. ?target=summarize(users.total,"1day","max")
+    # &format=json&from=20111201
     # becomes:
-    # ?target=summarize(users.total%2C%227d%22%2C%22max%22)&format=json&from=20110801
+    # ?target=summarize(users.total%2C%227d%22%2C%22max%22)
+    # &format=json&from=20110801
     '''
 
     __GRAPHITE_API_URL = settings.GRAPHITE_URL + '/render'
@@ -51,10 +53,11 @@ class UserStatistics(object):
     @classmethod
     def _data_point_month(cls, datapoint):
         '''
-        Return a month as signified by 
+        Return a month as signified by
         the date of the first day of the month.
         '''
-        return datetime.date.fromtimestamp(datapoint[cls.__DATE_INDEX]).replace(day=1)
+        return datetime.date.fromtimestamp(
+            datapoint[cls.__DATE_INDEX]).replace(day=1)
 
     @classmethod
     def _data_point_last_month(cls, last_datapoint):
@@ -73,7 +76,7 @@ class UserStatistics(object):
     @classmethod
     def _date_range(cls, daily_accumulated_users):
         '''
-        From the user history 
+        From the user history
         calculate the inclusive data range
         on a whole month basis.
         Ignore the incomplete statistics of the last month.
@@ -111,7 +114,7 @@ class UserStatistics(object):
     @classmethod
     def _monthly_bins_as_array(cls, month_bins):
         '''
-        Reorganise monthly bins into a date sorted array of 
+        Reorganise monthly bins into a date sorted array of
         dictionary items.
         '''
         monthly_registrations = []
@@ -140,12 +143,12 @@ class UserStatistics(object):
     @classmethod
     def _monthly_accumulated_users(cls):
         '''
-        Determine the history of the 
+        Determine the history of the
         cumulative registered user count
         at the end of each month.
 
         The data from a Graphite API query by day is post processed,
-        since the Graphite function summarize has a bin of 
+        since the Graphite function summarize has a bin of
         1month = 30 days exactly,
         and so doesn't produce the desired result.
         '''
@@ -162,13 +165,14 @@ class UserStatistics(object):
         Retrieve the history of the cumulative count of users
         added by the end of each day.
         '''
-        accumulated_users_at_end_of_month = 'summarize(users.total,"1d","max", True)'
+        accumulated_users_at_end_of_month = \
+            'summarize(users.total,"1d","max", True)'
         return cls._query_graphite_api(accumulated_users_at_end_of_month)
 
     @classmethod
     def _query_graphite_api(cls, api_function):
         '''
-        Issue a HTTP request to the Graphite end-point 
+        Issue a HTTP request to the Graphite end-point
         and return just the data points as a list.
         '''
         argments = cls.__BASE_ARGUMENTS + \
@@ -177,4 +181,4 @@ class UserStatistics(object):
         response = requests.get(cls.__GRAPHITE_API_URL + query)
         body_str = response.content
         data = json.loads(body_str)[0]['datapoints']
-        return filter(lambda item: item[0] != None, data)
+        return filter(lambda item: item[0] is not None, data)

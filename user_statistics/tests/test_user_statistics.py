@@ -6,12 +6,14 @@ from requests import Response
 import requests
 from os import path
 
-from user_statistics.services.user_statistics import UserStatistics
-from user_statistics.tests.expected_users_statistics import ExpectedUserStatistics
+from user_statistics.services.user_statistics \
+    import UserStatistics
+from user_statistics.tests.expected_users_statistics \
+    import ExpectedUserStatistics
 
 
 def path_for_tests(file_name):
-    """Returns the absolute path to the merged dirname 
+    """Returns the absolute path to the merged dirname
     of the pathname and filename."""
     return path.abspath(path.join(path.dirname(__file__), file_name))
 
@@ -19,7 +21,8 @@ def path_for_tests(file_name):
 def totimestamp(dt, epoch=datetime.datetime(1970, 1, 1)):
     td = dt - epoch
     # return td.total_seconds()
-    return (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10 ** 6) / 1e6
+    return (td.microseconds
+            + (td.seconds + td.days * 24 * 3600) * 10 ** 6) / 1e6
 
 
 def create_data_point(year, month, day, value):
@@ -206,12 +209,14 @@ class UserStatisticsTest(TestCase):
         self.assertEqual(8, bins_array[1]['count'])
 
     def test_monthly_accumulated_users_calls(self):
-        saved_find_daily_accumulated_users = UserStatistics._find_daily_accumulated_users
+        saved_find_daily_accumulated_users = \
+            UserStatistics._find_daily_accumulated_users
         saved_date_range = UserStatistics._date_range
         saved_create_month_bins = UserStatistics._create_month_bins
         saved_populate_month_bins = UserStatistics._populate_month_bins
         saved_monthly_bins_as_array = UserStatistics._monthly_bins_as_array
-        UserStatistics._find_daily_accumulated_users = dummy_find_daily_accumulated_users
+        UserStatistics._find_daily_accumulated_users = \
+            dummy_find_daily_accumulated_users
         UserStatistics._date_range = dummy_date_range
         UserStatistics._create_month_bins = dummy_create_month_bins
         UserStatistics._populate_month_bins = dummy_populate_month_bins
@@ -225,15 +230,18 @@ class UserStatisticsTest(TestCase):
             expected_result = [item0, item1]
             self.assertEqual(expected_result, actual_result)
         finally:
-            UserStatistics._find_daily_accumulated_users = saved_find_daily_accumulated_users
+            UserStatistics._find_daily_accumulated_users = \
+                saved_find_daily_accumulated_users
             UserStatistics._date_range = saved_date_range
             UserStatistics._create_month_bins = saved_create_month_bins
             UserStatistics._populate_month_bins = saved_populate_month_bins
             UserStatistics._monthly_bins_as_array = saved_monthly_bins_as_array
 
     def test_monthly_frequency(self):
-        saved_monthly_accumulated_users = UserStatistics._monthly_accumulated_users
-        UserStatistics._monthly_accumulated_users = dummy_monthly_accumulated_users
+        saved_monthly_accumulated_users = \
+            UserStatistics._monthly_accumulated_users
+        UserStatistics._monthly_accumulated_users = \
+            dummy_monthly_accumulated_users
         try:
             month0 = datetime.date(2014, 10, 1)
             month1 = datetime.date(2014, 11, 1)
@@ -245,15 +253,18 @@ class UserStatisticsTest(TestCase):
                 expected_frequency,
                 actual_frequency)
         finally:
-            UserStatistics._monthly_accumulated_users = saved_monthly_accumulated_users
+            UserStatistics._monthly_accumulated_users = \
+                saved_monthly_accumulated_users
 
     def test_find_daily_accumulated_users_return_response(self):
         saved_get = requests.get
         requests.get = dummy_get
         try:
-            actual_accumulated_users = UserStatistics._find_daily_accumulated_users()
+            actual_accumulated_users = \
+                UserStatistics._find_daily_accumulated_users()
             self.assertEqual(
-                ExpectedUserStatistics.daily_accumulated_users,
+                ExpectedUserStatistics
+                .daily_accumulated_users,
                 actual_accumulated_users)
         finally:
             requests.get = saved_get
@@ -262,7 +273,8 @@ class UserStatisticsTest(TestCase):
         saved_get = requests.get
         requests.get = dummy_get
         try:
-            actual_accumulated_users = UserStatistics._monthly_accumulated_users()
+            actual_accumulated_users = \
+                UserStatistics._monthly_accumulated_users()
             actual_dates = map(
                 lambda item: item['date'], actual_accumulated_users)
             self.assertEqual(

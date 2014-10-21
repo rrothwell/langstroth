@@ -64,7 +64,7 @@ function buildTable(pageAreaSelector, isCoreQuota) {
         .attr("class", "for-projects table-striped table-bordered table-condensed table-hover");
   // var caption = table.append("caption").text(forHeadings.caption);
   var thead = table.append("thead");
-  // var tbody = table.append("tbody");
+  table.append("tbody");
 
   // The row headers
   var headerRow = thead.append("tr");

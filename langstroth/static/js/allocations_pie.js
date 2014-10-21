@@ -17,7 +17,8 @@ function isForCodeLevel() {
   return breadCrumbs.length < 4;
 }
 
-// Recursive code to return allocation tree branch (children) addressed by FOR code.
+// Recursive code to return allocation tree branch (children)
+// addressed by FOR code.
 // The forCode is the FOR2, FOR4 or FOR6 code.
 // The allocationObjects is the allocationTree object being passed in.
 function traverseHierarchy(route, allocationTree) {
@@ -48,7 +49,9 @@ function restructureAllocations(allocationTree, isCoreQuota) {
   var colourIndex = 0;
   var dataset = [];
   var allocationCount = allocationTree.length;
-  for (var allocationIndex = 0; allocationIndex < allocationCount; allocationIndex++) {
+  for (var allocationIndex = 0;
+    allocationIndex < allocationCount;
+    allocationIndex++) {
     var sum = 0.0;
     var child = allocationTree[allocationIndex];
     var name = child.name;
@@ -95,7 +98,8 @@ function nextLevelSum(children, isCoreQuota) {
 
 //==== String utilities
 
-// String abbreviate to set length and signify abbreviation by adding ellipsis.
+// String abbreviate to set length
+// and signify abbreviation by adding ellipsis.
 String.prototype.abbreviate = function(charCount) {
   var labelStr = this;
   if (this.length > charCount) {
@@ -246,7 +250,8 @@ function zoomIn(data) {
     tabulateAllocations(table, dataset, totalResource, isCoreQuota);
   } else {
     // Instead of zooming plot navigate to another page.
-    window.location.href = '/allocations/applications/' + data.id + '/approved';
+    window.location.href = '/allocations/applications/' +
+      data.id + '/approved';
   }
 }
 
@@ -355,37 +360,10 @@ function hideRelatedLabels(d, i) {
 
 var projectMarkup = "<div class='details-container centred-container'>" +
       "<table class='table-striped table-condensed'>" +
-      "<tr>" +
-      "<th>" +
-      "Project: " +
-      "</th>" +
-      "<td>" +
-      "{{projectName}}" +
-      "</td>" +
-      "</tr>" +
-      "<th>" +
-      "Institution: " +
-      "</th>" +
-      "<td>" +
-      "{{institutionName}}" +
-      "</td>" +
-      "</tr>" +
-      "<tr>" +
-      "<th>" +
-      "Core quota: " +
-      "</th>" +
-      "<td>" +
-      "{{coreQuota}}" +
-      "</td>" +
-      "</tr>" +
-      "<tr>" +
-      "<th>" +
-      "Instance quota: " +
-      "</th>" +
-      "<td>" +
-      "{{instanceQuota}}" +
-      "</td>" +
-      "</tr>" +
+      "<tr><th>Project: </th><td>{{projectName}}</td></tr>" +
+      "<tr><th>Institution: </th><td>{{institutionName}}</td></tr>" +
+      "<tr><th>Core quota: </th><td>{{coreQuota}}</td></tr>" +
+      "<tr><th>Instance quota: </th><td>{{instanceQuota}}</td></tr>" +
       "</table>" +
       "</div>";
 
@@ -407,12 +385,8 @@ function showProjectSummary(data) {
 var forMarkup = "<div class='details-container centred-container'>" +
       "<table class='table-condensed'>" +
       "<tr>" +
-      "<th>" +
-      "{{forCode}}:&nbsp;" +
-      "</th>" +
-      "<td style='text-transform: capitalize;'>" +
-      "{{forName}}" +
-      "</td>" +
+      "<th>{{forCode}}:&nbsp;</th>" +
+      "<td style='text-transform: capitalize;'>{{forName}}</td>" +
       "</tr>" +
       "</table>" +
       "</div>";
@@ -431,8 +405,10 @@ function showFORDescription(d) {
 
 function visualise( dataset, totalResource ) {
 
-  var countLabelPrefix = selectedCoreQuota() ? "Core count: " : "Instance count: ";
-  totalText.text(function(d) { return countLabelPrefix + totalResource.toFixed(0); });
+  var countLabelPrefix = selectedCoreQuota() ? "Core count: "
+      : "Instance count: ";
+  totalText.text(function(d) {
+    return countLabelPrefix + totalResource.toFixed(0); });
 
   // Build the node list, attaching the new data.
   var nodes = pie(dataset);
@@ -580,10 +556,12 @@ function navigate() {
     .data(breadCrumbs)
     .enter()
     .append("li")
-    .attr("class", function(d, i) { return i == breadCrumbs.length - 1 ? "active" : ""; })
+    .attr("class", function(d, i) { return i == breadCrumbs.length - 1 ?
+        "active" : ""; })
     .html(function(d, i) {
       var forCode = d;
-      var markup = forCode == '*' ? '<span class="glyphicon glyphicon-home"></span>'
+      var markup = forCode == '*' ?
+          '<span class="glyphicon glyphicon-home"></span>'
             : '<span style="text-transform: capitalize">' +
             forTitleMap[forCode].toLowerCase() +
             '</span>';
@@ -627,7 +605,9 @@ function arcTween(a) {
 }
 
 function arcTweenOut(a) {
-  var i = d3.interpolate(this._current, {startAngle: Math.PI * 2, endAngle: Math.PI * 2, value: 0});
+  var i = d3.interpolate(
+      this._current,
+      {startAngle: Math.PI * 2, endAngle: Math.PI * 2, value: 0});
   this._current = i(0);
   return function (t) {
     return arc(i(t));
@@ -656,7 +636,9 @@ function processResponse(allocationTree, resource) {
 
 function load() {
   d3.json("/allocations/rest/for_codes", function(error, forObjects) {
-    d3.json("/allocations/rest/applications/approved/tree", function(error, allocationObjects) {
+    d3.json(
+        "/allocations/rest/applications/approved/tree",
+        function(error, allocationObjects) {
       breadCrumbs = ['*'];
       forTitleMap = forObjects;
       allocationTree = allocationObjects.children;
@@ -688,4 +670,8 @@ function change() {
 d3.selectAll("button").on("click", change);
 
 var plotArea = $("#plot-area");
-plotArea.stick_in_parent({parent: "#inner-plot-container", inner_scrolling: true, offset_top:0});
+plotArea.stick_in_parent(
+    {
+      parent: "#inner-plot-container",
+      inner_scrolling: true, offset_top:0
+    });
